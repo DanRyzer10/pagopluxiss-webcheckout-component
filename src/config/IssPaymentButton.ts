@@ -14,8 +14,8 @@ class IssPaymentButton {
         this.config = setup;
         this.container = document.getElementById('iss-payment-button');
         this.services = {
-            service_key:'https://sandbox.isspay.id/isspay/checkout',
-            service_bridge:'https://sandbox.isspay.id/isspay/bridge'
+            service_key:'/api/webcheckout/send-payform',
+            service_bridge:'/api/webcheckout/sendPayform'
         }
         this.initialize();
     }

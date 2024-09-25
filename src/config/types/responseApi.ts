@@ -1,5 +1,7 @@
+import { PagoPluxResponse } from "./PagoPluxResponse";
+
 export interface responseppx{
-    data:object,
+    data:PagoPluxResponse,
     status:number,
     code:number
 }
