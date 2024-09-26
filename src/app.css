@@ -1,25 +1,167 @@
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+body{
+  font-family: 'Nunito', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+.ppxiss-main-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ppxiss-button-payiss-pay{
+  width: 200px;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 20px;
+    padding: 10px 20px;
+    animation: pulse 2s infinite;
+    transition: background 0.3s ease;
+}
+.ppxiss-button-active{
+  background: linear-gradient(0deg, #1D3AA0 0%, #0085FF 100%);
+  cursor: pointer;
+}
+.ppxiss-message-errors{
+  color: red;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+.ppxiss-button-inactive{
+  background: #C5CDEC;
+  cursor: no-drop;
+}
+.ppxiss-button-payiss-pay span {
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+    font-weight: 800;
+    color: white;
+    line-height: 21.82px;
+}
+.ppxiss-card-brand-container{
+  background: radial-gradient(94.37% 100% at 50% 0%, #0085FF 5.9%, #1451BE 60.4%, #1D3AA0 100%);
+  border-radius: 20px;
+  padding: 20px 15px;
+  margin-bottom: 20px;
+  width: 214px;
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+}
+.ppxiss-card-brand-container-card{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+.ppxiss-card-brand-font-large{
+  color: white;
+  font-size: 18px;
+  font-weight: 800;
+}
+.ppxiss-input-component{
+  width: 100%;
+  padding: 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+.ppxiss-input-component-error{
+  border: 1px solid red;
+}
+.ppxiss-input-component-ok{
+  border: 1px solid #C5CDEC;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.preact:hover {
-  filter: drop-shadow(0 0 2em #673ab8aa);
+.ppxiss-input-component::placeholder{
+  color: #C5CDEC;
 }
 
-.card {
-  padding: 2em;
+.ppxiss-input-component:focus{
+  outline: none;
+  border: 1px solid #0085FF;
+}
+.ppxiss-card-brand-font-medium{
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+}
+.ppxiss-card-brand-font-small{
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+.ppxiss-card-brand-container-date-brandname{
+  display: flex; 
+}
+.ppxiss-card-brand-container-date-brandname-column{
+  display: flex;
+  width: 50%;
+}
+.ppxiss-left{
+  justify-content: flex-start;
+}
+.ppxiss-right{
+  justify-content: flex-end;
 }
 
-.read-the-docs {
-  color: #888;
+
+
+/* Container */
+.ppxiss-container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
+.ppxiss-form-container{
+  padding: 10px;
+}
+
+.ppxiss-container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* Row */
+.ppxiss-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+/* Columns */
+.ppxiss-col {
+  position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.ppxiss-col-1 { flex: 0 0 8.333333%; max-width: 8.333333%; }
+.ppxiss-col-2 { flex: 0 0 16.666667%; max-width: 16.666667%; }
+.ppxiss-col-3 { flex: 0 0 25%; max-width: 25%; }
+.ppxiss-col-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
+.ppxiss-col-5 { flex: 0 0 41.666667%; max-width: 41.666667%; }
+.ppxiss-col-6 { flex: 0 0 50%; max-width: 50%; }
+.ppxiss-col-7 { flex: 0 0 58.333333%; max-width: 58.333333%; }
+.ppxiss-col-8 { flex: 0 0 66.666667%; max-width: 66.666667%; }
+.ppxiss-col-9 { flex: 0 0 75%; max-width: 75%; }
+.ppxiss-col-10 { flex: 0 0 83.333333%; max-width: 83.333333%; }
+.ppxiss-col-11 { flex: 0 0 91.666667%; max-width: 91.666667%; }
+.ppxiss-col-12 { flex: 0 0 100%; max-width: 100%; }

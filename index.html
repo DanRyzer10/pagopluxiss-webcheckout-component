@@ -4,12 +4,29 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Preact + TS</title>
+    <title>Boton de pagos</title>
   </head>
   <body>
+    <style>
+      #iss-payment-button{
+          background-color: #FEFEFE;
+          border: none;
+          width: 300px;
+          padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+          border-radius: 5px;
+        margin-top: 20px;
+        border: 1.5px solid;
+        border-radius: 20px;
+        width: 300px;
+        height: 500px;
+        display: flex;
+      }
+    </style>
     <div id="iss-payment-button"></div>
     <script type="module" src="/src/index.ts"></script>
-    <!-- <script type="module">
+    <script type="module">
       new IssPaymentButton({
     setting: {
         code: '674',
@@ -57,6 +74,6 @@
     redirect_url: 'http://localhost:3000',
 });
 
-    </script> -->
+    </script>
   </body>
 </html>

@@ -20,15 +20,16 @@ export const ValidatedInput = ({ validator, errorMessage, onChange, name,label, 
   }, [validator, errorMessage, onChange, name]);
 
   return (
-    <div className="mb-4">
+    <div className="">
         <label htmlFor="creditCard">{label}</label>
       <input
         type="text"
         value={value}
         onInput={handleChange}
-        className={`w-full px-3 py-2 border rounded-md ${error ? 'border-red-500' : 'border-gray-300'}`}
+        placeholder='xxxx xxxx xxxx xxxx'
+        className={`ppxiss-input-component ${error ? 'ppxiss-input-component-error' : 'ppxiss-input-component-ok'}`}
       />
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className="ppxiss-message-errors">{error}</p>}
     </div>
   );
 };

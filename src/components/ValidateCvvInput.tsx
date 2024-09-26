@@ -29,9 +29,10 @@ export const ValidateCvvInput = ({ validator, errorMessage, onChange, name,label
         type="password"
         value={value}
         onInput={handleChange}
-        className={`w-full px-3 py-2 border rounded-md ${error ? 'border-red-500' : 'border-gray-300'}`}
+        placeholder='CVV'
+        className={`ppxiss-input-component ${error ? 'ppxiss-input-component-error' : 'ppxiss-input-component-ok'}`}
       />
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className="ppxiss-message-errors">{error}</p>}
     </div>
   );
 };
