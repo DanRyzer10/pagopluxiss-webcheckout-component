@@ -6,6 +6,13 @@ export interface config {
         secretKey:string, // llave simetrica de 32 caracteres
         simetricKey:string //llave simetrica encriptada con llave publica de pagoplux
     },
+    business:{
+        name:string,
+        email:string,
+        country:string,
+        country_code:string,
+        phonenumber:string,
+    }
     reference_id:string,
     module:'COLLECTION' | 'SUBSCRIPTION' | 'TOKENIZATION',
     currency:string,

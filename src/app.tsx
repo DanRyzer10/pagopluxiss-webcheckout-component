@@ -270,6 +270,9 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             value={formData.card.cvv.value}
           ></ValidateCvvInput>
          </div>
+         <div >
+          {config.setting.production ?(<div></div>):(<div>Entorno de pruebas xdxd</div>)}
+         </div>
           <button
             type="submit"
             className={`ppxiss-button-payiss-pay ${
@@ -277,7 +280,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             }`}
             disabled={!isFormValid()}
           >
-            <span>{`Pagar ${config.module=='TOKENIZATION'? config.total_amount+ config.currency:'Registrar tarjeta'} `}</span>
+            <span>{config.module==='TOKENIZATION'?'Registrar tarjeta':`Pagar ${config.total_amount}${config.currency}`}</span>
           </button>
         </form>
     </div>
