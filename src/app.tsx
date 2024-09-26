@@ -196,7 +196,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             documentNumber: config.buyer?.identity,
             firstName: config.buyer.names,
             lastName: config.buyer.lastnames,
-            phone: config.buyer.phonenumber,
+            phone: `${config.buyer.countrycode}${config.buyer.phonenumber}`,
             email: config.buyer.email,
           },
           shippingAddress: {
@@ -207,7 +207,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           },
           paramsRecurrent: {},
           currency: config.currency,
-          description: config.items?.[0]?.name ?? "Descripcion de producto",
+          description: "registrar tarjeta",
           clientIp: config.buyer.ipaddress,
           idEstablecimiento: btoa(config.setting.code),
           urlRetorno3ds: config.redirect_url,
@@ -277,7 +277,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             }`}
             disabled={!isFormValid()}
           >
-            <span>{`Pagar ${config.total_amount} ${config.currency}`}</span>
+            <span>{`Pagar ${config.module=='TOKENIZATION'? config.total_amount+ config.currency:'Registrar tarjeta'} `}</span>
           </button>
         </form>
     </div>

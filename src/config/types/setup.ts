@@ -10,13 +10,6 @@ export interface config {
     module:'COLLECTION' | 'SUBSCRIPTION' | 'TOKENIZATION',
     currency:string,
     total_amount?:number,
-    items?:{
-        name:string,
-        quantity:number,
-        price:number,
-        discount?:number,
-        amount:number
-    }[],
     installmentCredit?:{
         code:string,
         name:string,
