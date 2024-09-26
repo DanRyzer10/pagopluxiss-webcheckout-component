@@ -1,49 +1,46 @@
-import {ContainerNode, h,render} from 'preact';
+import { ContainerNode, h, render } from 'preact';
 import { config } from './types/setup';
 import { PaymentButton } from '../app';
 
 class IssPaymentButton {
-    private config:config;
-    private container:ContainerNode | null;
-    private readonly services:{
-        service_key:string,
-        service_bridge:string
+    private config: config;
+    private container: ContainerNode | null;
+    private readonly services: {
+        service_key: string,
+        service_bridge: string
     }
 
-    constructor(setup:config){
+    constructor(setup: config) {
         this.config = setup;
         this.container = document.getElementById('iss-payment-button');
         this.services = {
-            service_key:'/api/webcheckout/send-payform',
-            service_bridge:'/api/webcheckout/sendPayform'
+            service_key: '/api/webcheckout/send-payform',
+            service_bridge: '/api/webcheckout/sendPayform'
         }
         this.initialize(this.config);
     }
 
     private initialize(config: any) {
-        const validateConfig = (config: any): string[] => {
+        const validateConfigProps = (config: config): string[] => {
             const errors: string[] = [];
-    
-            const requiredConfigProperties: { [key: string]: string | object } = {
+            const schema: { [key: string]: string | object | string[] } = {
                 setting: {
                     production: 'boolean',
                     code: 'string',
                     authorization: 'string',
                     secretKey: 'string',
-                    simetricKey: 'string'
+                    simetricKey: 'string',
                 },
                 business: {
                     name: 'string',
                     email: 'string',
                     country: 'string',
                     country_code: 'string',
-                    phonenumber: 'string'
+                    phonenumber: 'string',
                 },
                 reference_id: 'string',
                 module: 'string',
                 currency: 'string',
-                total_amount: 'number',
-                installmentCredit: 'object',
                 buyer: {
                     document_type: 'string',
                     identity: 'string',
@@ -52,18 +49,24 @@ class IssPaymentButton {
                     email: 'string',
                     countrycode: 'string',
                     phonenumber: 'string',
-                    ipaddress: 'string'
+                    ipaddress: 'string',
                 },
                 shipping_address: {
                     country: 'string',
                     state: 'string',
                     city: 'string',
                     Zipcode: 'string',
-                    street: 'string'
+                    street: 'string',
                 },
                 redirect_url: 'string',
-            };
-    
+            }
+            if (!['COLLECTION', 'SUBSCRIPTION', 'TOKENIZATION'].includes(config.module)) {
+                errors.push(`Propiedad de modulo inválida: ${config.module} no pertenece a COLLECTION,SUBSCRIPTION,TOKENIZATION`)
+            }
+            if (config.module === 'COLLECTION' || config.module === 'SUBSCRIPTION') {
+                schema['total_amount'] = 'number',
+                schema['installmentCredit'] = 'object'
+            }
             const validateObject = (obj: any, schema: any, path: string = ''): void => {
                 for (const key in schema) {
                     const fullPath = path ? `${path}.${key}` : key;
@@ -82,22 +85,22 @@ class IssPaymentButton {
                     }
                 }
             };
-    
-            validateObject(config, requiredConfigProperties);
-    
+
+            validateObject(config, schema);
+
             return errors;
-        };
-    
-        const errors = validateConfig(config);
-    
+        }
+
+        const errors: string[] = validateConfigProps(config)
         if (errors.length > 0) {
             console.error(`Config validation errors:\n${errors.join('\n')}`);
             throw new Error('Error al renderizar el componente');
         } else {
             this.renderButton();
         }
-    }
-    private renderButton(){
+    };
+    
+    private renderButton() {
         if (this.container) {
             render(
                 h(PaymentButton, { config: this.config, services: this.services }),

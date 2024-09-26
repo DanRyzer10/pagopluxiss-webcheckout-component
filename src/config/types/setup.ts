@@ -40,6 +40,4 @@ export interface config {
         street:string,
     },
     redirect_url:string,
-    clientIp:string,
-    description:string
 }
