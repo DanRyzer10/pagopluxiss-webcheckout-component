@@ -20,8 +20,9 @@ export const ValidatedInput = ({ validator, errorMessage, onChange, name,label, 
   }, [validator, errorMessage, onChange, name]);
 
   return (
-    <div className="">
-        <label htmlFor="creditCard">{label}</label>
+   <div>
+     <div className="ppxiss-input-field-container">
+        {!error && <label className='ppx-iss-input-label' htmlFor="creditCard">{label}</label>}
       <input
         type="text"
         value={value}
@@ -31,5 +32,6 @@ export const ValidatedInput = ({ validator, errorMessage, onChange, name,label, 
       />
       {error && <p className="ppxiss-message-errors">{error}</p>}
     </div>
+   </div>
   );
 };

@@ -20,11 +20,13 @@ border-radius: 20px;
 width: 300px;
 height: 500px;
 display: flex;
+justify-content: center;
 }
 .ppxiss-main-container{
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 300px;
 }
 .ppxiss-button-payiss-pay{
   width: 200px;
@@ -40,16 +42,35 @@ display: flex;
     animation: pulse 2s infinite;
     transition: background 0.3s ease;
 }
+.ppxiss-text-footeer-small{
+  font-size: 12px;
+  font-weight: 500;
+  color: #1D3AA0;
+}
 .ppxiss-button-active{
   background: linear-gradient(0deg, #1D3AA0 0%, #0085FF 100%);
   cursor: pointer;
 }
+.ppx-iss-button-container{
+  display: flex;
+  justify-content: center;
+}
+.ppx-iss-input-label{
+  z-index: 10;
+  bottom: 45px;
+  left: 15px;
+  background-color: white;
+  font-size: 14px;
+  font-weight: 500;
+  position: absolute;
+  color: #C5CDEC;
+}
 .ppxiss-message-errors{
+  margin: 0;
   color: red;
   font-size: 12px;
   font-weight: 500;
-  margin-top: 5px;
-  margin-bottom: 0px;
+  margin-bottom: 16px;
 }
 .ppxiss-button-inactive{
   background: #C5CDEC;
@@ -85,17 +106,23 @@ display: flex;
   font-size: 18px;
   font-weight: 800;
 }
+.ppxiss-input-field-container{
+  position: relative;
+}
 .ppxiss-input-component{
+  position: relative;
   width: 100%;
   padding: 10px;
   border-radius: 20px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 .ppxiss-input-component-error{
   border: 1px solid red;
+ 
 }
 .ppxiss-input-component-ok{
   border: 1px solid #C5CDEC;
+  margin-bottom: 16px;
 }
 
 .ppxiss-input-component::placeholder{
@@ -142,6 +169,7 @@ display: flex;
 }
 .ppxiss-form-container{
   padding: 10px;
+  width: 100%;
 }
 
 .ppxiss-container-fluid {

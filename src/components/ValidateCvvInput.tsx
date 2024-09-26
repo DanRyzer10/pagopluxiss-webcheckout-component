@@ -23,8 +23,8 @@ export const ValidateCvvInput = ({ validator, errorMessage, onChange, name,label
     onChange(name, newValue, isValid);
   }, [validator, errorMessage, onChange, name]);
   return (
-    <div className="mb-4">
-        <label htmlFor="creditCard">{label}</label>
+    <div className="ppxiss-input-field-container">
+          {!error && <label className='ppx-iss-input-label' htmlFor="creditCard">{label}</label>}
       <input
         type="password"
         value={value}
