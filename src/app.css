@@ -1,4 +1,86 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+/* reset.css */
+
+/* Basic Reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Additional Reset */
+input, button, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+
+input[type="text"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
 body{
   font-family: 'Nunito', sans-serif;
   display: flex;
@@ -6,11 +88,54 @@ body{
   align-items: center;
   box-sizing: border-box;
 }
+.ppxiss-input-container{
+  margin-bottom: 15px;
+}
+.ppxiss-modal-container{
+  position: fixed;
+  border: none;
+  border-radius: 20px;
+  padding: 20px;
+  height: 215px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #FEFEFE;
+  z-index: 1000;
+}
+.ppxiss-button-container{
+  padding: 0 20px;
+}
+.ppxiss-otp-input{
+  width: 100%;
+  height: 50px;
+  outline: none;
+  border: 1px solid #DADADA;
+  border-radius: 20px;
+
+}
+.ppxiss-modal-content{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+}
+.ppxiss-modal-title{
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 10px;
+  color:#1D3AA0 ;
+}
+.ppxiss-modal-container::backdrop {
+  background-color: rgba(128, 128, 128, 0.5); /* Gris y transparente */
+}
 #iss-payment-button{
   background-color: #FEFEFE;
   border: none;
   width: 300px;
-  padding: 10px 20px;
+  padding: 10px 5px;
 font-size: 16px;
 cursor: pointer;
   border-radius: 5px;
@@ -18,15 +143,32 @@ margin-top: 20px;
 border: 1.5px solid;
 border-radius: 20px;
 width: 300px;
-height: 500px;
 display: flex;
-justify-content: center;
+
 }
 .ppxiss-main-container{
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 300px;
+}
+.ppxiss-form-otp{
+  text-align: center;
+}
+.ppxiss-medium-width{
+  width: 140px !important;
+}
+.ppxiss-footer-info-resend{
+  font-weight: 500;
+  font-size: 10px;
+  text-decoration-line: underline;
+  color: #838383 ;
+  cursor: pointer;
+}
+.ppxiss-footer-info{
+  font-size: 10px;
+  font-weight: 300;
+  color: #838383 ;
 }
 .ppxiss-button-payiss-pay{
   width: 200px;
@@ -57,13 +199,13 @@ justify-content: center;
 }
 .ppx-iss-input-label{
   z-index: 10;
-  bottom: 45px;
+  bottom: 42px;
   left: 15px;
   background-color: white;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 500;
   position: absolute;
-  color: #C5CDEC;
+  color: #DADADA;
 }
 .ppxiss-message-errors{
   margin: 0;
@@ -71,6 +213,9 @@ justify-content: center;
   font-size: 12px;
   font-weight: 500;
   margin-bottom: 16px;
+}
+.ppxiss-card-brand-padding{
+  padding: 5px 25px !important;
 }
 .ppxiss-button-inactive{
   background: #C5CDEC;
@@ -86,13 +231,14 @@ justify-content: center;
 .ppxiss-card-brand-container{
   background: radial-gradient(94.37% 100% at 50% 0%, #0085FF 5.9%, #1451BE 60.4%, #1D3AA0 100%);
   border-radius: 20px;
-  padding: 20px 15px;
+  padding: 18px 12px;
   margin-bottom: 20px;
-  width: 214px;
-  height: 90px;
+  width: 270px;
+  height: 118px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  
 
 }
 .ppxiss-card-brand-container-card{
@@ -112,7 +258,8 @@ justify-content: center;
 .ppxiss-input-component{
   position: relative;
   width: 100%;
-  padding: 10px;
+  height: 32px;
+  padding: 7px 15px;
   border-radius: 20px;
   margin-bottom: 5px;
 }
@@ -121,7 +268,7 @@ justify-content: center;
  
 }
 .ppxiss-input-component-ok{
-  border: 1px solid #C5CDEC;
+  border: 1px solid #DADADA;
   margin-bottom: 16px;
 }
 
@@ -157,7 +304,41 @@ justify-content: center;
   justify-content: flex-end;
 }
 
+.ppxiss-align-center{
+  display: flex;
+  justify-content: center;
 
+}
+
+#creditType{
+  width: 100%;
+  height: 39px;
+  padding: 7px 15px;
+  border-radius: 20px;
+  margin-bottom: 5px;
+  border: 1px solid #DADADA;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg fill="%23000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+  padding-right: 30px; 
+}
+#creditType::after{
+  content: '▼';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+#creditType option{
+  background: white;
+  color: #212121;
+}
+#creditType option:hover{
+  background-color: #DADADA;
+}
 
 /* Container */
 .ppxiss-container {

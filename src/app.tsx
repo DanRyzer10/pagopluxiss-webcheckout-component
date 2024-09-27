@@ -1,5 +1,6 @@
 // #region IMPORTS
 import { useEffect, useState } from "preact/hooks";
+import SvgIcon from './img/issLogo'
 import {
   validateCardNumber,
   validateCVV,
@@ -16,6 +17,7 @@ import { ApiService } from "./services/api.service";
 import { responseppx } from "./config/types/responseApi";
 import { CardBrand } from "./components/cardBrand";
 import "./app.css";
+import { ValidatedDropdown } from "./components/DropDown";
 // #endregion
 // #region INTERFACES
 interface PaymentButtonProps {
@@ -34,11 +36,16 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
       number: { value: "", isValid: false },
       expirationDate: { value: "", isValid: false },
       cvv: { value: "", isValid: false },
+      creditType: { value: "", isValid: false },
     },
   });
+  
   const [payload, setPayload] = useState<payloadppx>();
+  const [resendModal, setResendModal] = useState(false);
   const [isVisibleModal, setVisibleModal] = useState(false);
   const [response, setResponse] = useState<responseppx>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [clearValue,setClearValue] = useState(false)
   const [otp, setOtp] = useState("");
   useEffect(() => {
     if (otp.length >= 6) {
@@ -51,6 +58,35 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
       }));
     }
   }, [otp]);
+
+  useEffect(()=>{
+    return ()=>{
+      setFormData({
+        card: {
+          number: { value: "", isValid: false },
+          expirationDate: { value: "", isValid: false },
+          cvv: { value: "", isValid: false },
+          creditType: { value: "", isValid: false },
+        },
+      })
+      setClearValue(true)
+      setOtp('')
+    }
+  },[])
+  useEffect(()=>{
+    if(resendModal){
+      setFormData((prevData) => ({
+        card: {
+        number:{value:prevData.card.number.value,isValid:true},
+        expirationDate:{value:prevData.card.expirationDate.value,isValid:true},
+        cvv:{value:'',isValid:false},
+        creditType:{value:prevData.card.creditType.value,isValid:true
+        }}
+      }));
+      console.log(formData)
+      handleInputChange('cvv','',false)
+    }
+  },[resendModal])
   // #endregion
 
   const handleOtp = (otp: any) => {
@@ -71,6 +107,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   // #region POSTDATA FORM
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setIsLoading(true);
     if (isFormValid()) {
       const payload = await convertToPayload();
       let response: responseppx | undefined;
@@ -114,6 +151,8 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
         }
       } catch (e) {
         console.error(e);
+      }finally{
+        setIsLoading(false);
       }
     } else {
       console.error("Formulario inválido. Por favor, corrija los errores.");
@@ -227,23 +266,34 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
     const fullUrl = `${baseUrl}?${queryParams}`;
     window.location.href = fullUrl;
   };
+  const resendOtp = () =>{
+    setVisibleModal(false);
+    setResendModal(true)
+    //limpiar todos los datos
+    
+  }
   //#region JSX
   return (
-    <div class="ppxiss-main-container">
+    <div class="ppxiss-container">
       <OtpModal
+      onResendOtp={resendOtp}
         open={isVisibleModal}
         onAction={sendDataWithOtp}
         onOtpChange={handleOtp}
       ></OtpModal>
-      <div>
-        <CardBrand
-          cardNumber={formData.card.number.value}
-          expiredDate={formData.card.expirationDate.value}
-          names={config.buyer?.names}
-        />
+      <div class="ppxiss-row">
+        <div class="ppxiss-col ppxiss-align-center ppxiss-card-brand-padding">
+          <CardBrand
+            cardNumber={formData.card.number.value}
+            expiredDate={formData.card.expirationDate.value}
+            names={config.buyer?.names}
+          />
+        </div>
       </div>
-      <form class='ppxiss-form-container' onSubmit={handleSubmit}>
+      <form class="ppxiss-row" onSubmit={handleSubmit}>
+        <div class="ppxiss-col">
           <ValidatedInput
+             reset={clearValue}
             validator={validateCardNumber}
             errorMessage="Número de tarjeta inválida"
             onChange={handleInputChange}
@@ -251,40 +301,71 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             name="number"
             value={formData.card.number.value}
           ></ValidatedInput>
-         <div className=''>
-         <ValidateDateInput
-            validator={validateExpiryDate}
-            errorMessage="Fecha de expiración inválida"
-            onChange={handleInputChange}
-            label="Fecha de expiración"
-            name="expirationDate"
-            value={formData.card.expirationDate.value}
-          ></ValidateDateInput>
 
-          <ValidateCvvInput
-            validator={validateCVV}
-            errorMessage="CVV inválido"
-            onChange={handleInputChange}
-            label="CVV"
-            name="cvv"
-            value={formData.card.cvv.value}
-          ></ValidateCvvInput>
-         </div>
-          <div className="ppx-iss-button-container">
-          <button
+          <div class="ppxiss-row">
+            <div class="ppxiss-col ppxiss-col-6">
+              <ValidateDateInput
+                reset={clearValue}
+                validator={validateExpiryDate}
+                errorMessage="Fecha de expiración inválida"
+                onChange={handleInputChange}
+                label="Fecha de expiración"
+                name="expirationDate"
+                value={formData.card.expirationDate.value}
+              ></ValidateDateInput>
+            </div>
+            <div class="ppxiss-col ppxiss-col-6">
+              <ValidateCvvInput
+                reset={resendModal || clearValue}
+                validator={validateCVV}
+                errorMessage="CVV inválido"
+                onChange={handleInputChange}
+                label="CVV"
+                name="cvv"
+                value={formData.card.cvv.value}
+              ></ValidateCvvInput>
+            </div>
+          </div>
+          <div class='ppxiss-row'>
+            <div class='ppxiss-col'>
+              <ValidatedDropdown
+                validator={(value) => value !== ""}
+                errorMessage="Seleccione una opción"
+                onChange={handleInputChange}
+                label="Tipo de Crédito"
+                name="creditType"
+                options={[
+                  { key: "1", value: "Crédito" },
+                  { key: "2", value: "Débito" },
+                ]}
+                initialValue={formData.card.creditType.value}
+              >
+              </ValidatedDropdown>
+            </div>
+          </div>
+          <div class='ppxiss-row'>
+            <div class='ppxiss-col ppxiss-align-center'>
+            <button
             type="submit"
             className={`ppxiss-button-payiss-pay ${
-              isFormValid() ? "ppxiss-button-active" : "ppxiss-button-inactive"
+              isFormValid()  && !isLoading ? "ppxiss-button-active" : "ppxiss-button-inactive"
             }`}
-            disabled={!isFormValid()}
+            disabled={!isFormValid() || isLoading}
           >
-            <span>{config.module==='TOKENIZATION'?'Registrar tarjeta':`Pagar ${config.total_amount}${config.currency}`}</span>
+            <span>{config.module==='TOKENIZATION'?'Registrar tarjeta':`Pagar ${config.total_amount} ${config.currency}`}</span>
           </button>
+            </div>
           </div>
-          <div className="ppx-iss-button-container ppxiss-text-footeer-small">
+          <div class='ppxiss-row'>
+            <div class='ppxiss-col ppxiss-align-center'>
+              <SvgIcon></SvgIcon>
+            </div>
+          </div>
+          {/* <div>
           {config.setting.production ?(<div></div>):(<div>Entorno de pruebas xdxd</div>)}
-         </div>
-        </form>
+          </div> */}
+        </div>
+      </form>
     </div>
   );
 }

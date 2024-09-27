@@ -1,6 +1,6 @@
-import { useState, useCallback} from 'preact/hooks';
+import { useState, useCallback,useEffect} from 'preact/hooks';
 
-export const ValidateCvvInput = ({ validator, errorMessage, onChange, name,label, value: initialValue = '' }:any) => {
+export const ValidateCvvInput = ({ validator, errorMessage, onChange, name,label, reset,value: initialValue = '' }:any) => {
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState('');
   const formatOtpValue = (newValue:string) =>{
@@ -22,6 +22,13 @@ export const ValidateCvvInput = ({ validator, errorMessage, onChange, name,label
 
     onChange(name, newValue, isValid);
   }, [validator, errorMessage, onChange, name]);
+
+  useEffect(() => {
+    if (reset) {
+      setValue('');
+      setError('');
+    }
+  }, [reset]);
   return (
     <div className="ppxiss-input-field-container">
           {!error && <label className='ppx-iss-input-label' htmlFor="creditCard">{label}</label>}
