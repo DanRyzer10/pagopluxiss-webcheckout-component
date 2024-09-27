@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.1",
     "crypto-js": "^4.2.0",
     "preact": "^10.23.1",
     "vite-plugin-css-injected-by-js": "^3.5.1"

@@ -42,7 +42,7 @@ export function OtpModal({ open, onAction, onOtpChange,onResendOtp }: any) {
       setError({ otp: otpError });
       return;
     }
-    onAction();
+    onAction(e);
     setVisible(false);
   };
   return (

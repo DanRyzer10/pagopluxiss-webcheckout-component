@@ -18,16 +18,19 @@
           border-radius: 5px;
         margin-top: 20px;
         border: 1.5px solid;
-        border-radius: 20px;
-        width: 300px;
 
+        border-radius: 25px;
+        width: 300px;
+        border-image: linear-gradient(180deg, rgba(29, 58, 160, 0.1) 0%, #0085FF 50.5%, rgba(29, 58, 160, 0.1) 100%) 1;
         display: flex;
+        box-shadow: 4px 4px 10px 0px #0000000D;
+
         
       }
     </style>
     <div id="iss-payment-button"></div>
     <script type="module" src="/src/index.ts"></script>
-    <!-- <script type="module">
+    <script type="module">
       new IssPaymentButton({
     setting: {
         production:false,
@@ -59,8 +62,13 @@
     installmentCredit: [
        {
         code:'883',
-        name:'Sin interes',
+        name:'diferido',
         installments:[3,4,8,4]
+       },
+       {
+        code:'883',
+        name:'sin diferir',
+        installments:[]
        }
     ],
     buyer: {
@@ -83,6 +91,6 @@
     redirect_url: 'http://localhost:3000',
 });
 
-    </script> -->
+    </script>
   </body>
 </html>

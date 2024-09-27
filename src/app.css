@@ -146,6 +146,20 @@ width: 300px;
 display: flex;
 
 }
+.ppxiss-text-header-info{
+  font-size: 12px;
+  font-weight: 500;
+  color: #838383;
+}
+.ppxiss-text-strong{
+  font-weight: 600 !important;
+}
+.ppxiss-form-multi-select{
+  border-radius: 20px !important;
+}
+.MuiInputBase-root{
+  border-radius: 20px !important;
+}
 .ppxiss-main-container{
   display: flex;
   flex-direction: column;
@@ -169,6 +183,14 @@ display: flex;
   font-size: 10px;
   font-weight: 300;
   color: #838383 ;
+}
+.ppxiss-box-element{
+  margin: 0 !important;
+}
+#ppxiss-multiselect-label{
+  font-size: 15px;
+  font-weight: 500;
+  color: #DADADA;
 }
 .ppxiss-button-payiss-pay{
   width: 200px;
@@ -263,6 +285,9 @@ display: flex;
   border-radius: 20px;
   margin-bottom: 5px;
 }
+.ppxiss-input-component:hover{
+  border: 1px solid #000000;
+}
 .ppxiss-input-component-error{
   border: 1px solid red;
  
@@ -278,7 +303,7 @@ display: flex;
 
 .ppxiss-input-component:focus{
   outline: none;
-  border: 1px solid #0085FF;
+  border: 2px solid #0085FF;
 }
 .ppxiss-card-brand-font-medium{
   color: white;
@@ -309,7 +334,9 @@ display: flex;
   justify-content: center;
 
 }
-
+.ppxis-text-align-center{
+  text-align: center;
+}
 #creditType{
   width: 100%;
   height: 39px;

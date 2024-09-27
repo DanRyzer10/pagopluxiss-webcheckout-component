@@ -10,23 +10,18 @@ import { ValidatedInput } from "./components/ValidateInput";
 import { ValidateDateInput } from "./components/ValidateDateInput";
 import { ValidateCvvInput } from "./components/ValidateCvvInput";
 import { OtpModal } from "./components/OtpModal";
-import { config } from "./config/types/setup";
-import Encryptor from "./utils/encryptor";
+import { PaymentButtonProps,creditTypeValue,IDeferOptions } from "./types/appTypes";
 import { payloadppx } from "./config/types/payloadPagoplux";
 import { ApiService } from "./services/api.service";
 import { responseppx } from "./config/types/responseApi";
 import { CardBrand } from "./components/cardBrand";
 import "./app.css";
-import { ValidatedDropdown } from "./components/DropDown";
+import BasicSelect from "./components/material/MultiselectOption";
+import { SubmitButton } from "./components/SubmitButton";
+import useConvertToPayload from "./hooks/useConvertPayload";
+
 // #endregion
-// #region INTERFACES
-interface PaymentButtonProps {
-  config: config;
-  services: {
-    service_bridge: string;
-  };
-}
-// #endregion
+
 
 // #region COMPONENT APP
 export function PaymentButton({ config, services }: PaymentButtonProps) {
@@ -36,28 +31,35 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
       number: { value: "", isValid: false },
       expirationDate: { value: "", isValid: false },
       cvv: { value: "", isValid: false },
-      creditType: { value: "", isValid: false },
+      creditType: { value: {code:'',installments:[],name:''}, isValid: false } as creditTypeValue ,
     },
   });
-  
   const [payload, setPayload] = useState<payloadppx>();
   const [resendModal, setResendModal] = useState(false);
   const [isVisibleModal, setVisibleModal] = useState(false);
-  const [response, setResponse] = useState<responseppx>();
+  const [responseppx, setResponse] = useState<responseppx>();
   const [isLoading, setIsLoading] = useState(false);
   const [clearValue,setClearValue] = useState(false)
   const [otp, setOtp] = useState("");
-  useEffect(() => {
-    if (otp.length >= 6) {
-      setPayload((prevData: any) => ({
-        ...prevData,
-        paramsOtp: {
-          ...response?.data.detail,
-          otpCode: otp,
-        },
-      }));
-    }
-  }, [otp]);
+  const [isDefer,setisDefer] = useState(false)
+  const [deferOptions,setDeferOptions] =useState<IDeferOptions[]>([])
+
+  useEffect(()=>{
+    let installments:any[]  =formData.card.creditType.value.installments
+    let installmentOptions:IDeferOptions[] = []
+      if(installments.length > 0){
+        installments.forEach((element:any) => {
+          installmentOptions.push({
+            code:element,
+            name:`${element} Meses`
+          })
+        });
+        setDeferOptions(installmentOptions)
+        setisDefer(true)
+      }else{
+        setisDefer(false)
+      }
+  },[formData])
 
   useEffect(()=>{
     return ()=>{
@@ -66,7 +68,11 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           number: { value: "", isValid: false },
           expirationDate: { value: "", isValid: false },
           cvv: { value: "", isValid: false },
-          creditType: { value: "", isValid: false },
+          creditType: { value: {
+            code:'',
+            installments:[],
+            name:''
+          }, isValid: false },
         },
       })
       setClearValue(true)
@@ -103,13 +109,22 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const isFormValid = () => {
     return Object.values(formData.card).every((field) => field.isValid);
   };
-
+  const ConvertToPayload = useConvertToPayload(formData,config,setPayload)
   // #region POSTDATA FORM
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: any, action: 'submit' | 'otp') => {
     e.preventDefault();
+    console.log(formData);
     setIsLoading(true);
+    console.log(payload)
     if (isFormValid()) {
-      const payload = await convertToPayload();
+      //const payload = await convertToPayload();
+      const payload:any  = await ConvertToPayload()
+      if(action==='otp'){
+        payload.paramsOtp = {
+          ...responseppx?.data.detail,
+          otpCode: otp,
+        }
+      }
       let response: responseppx | undefined;
       try {
         const apiService = new ApiService(
@@ -118,6 +133,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
         );
         response = await apiService.post(services.service_bridge, payload);
         setResponse(response);
+  
         /**
          * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
          */
@@ -133,7 +149,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 )}`
             )
             .join("&");
-
+  
           const fullUrl: string = `${challengeUrl}&${queryParams}`;
           const redirectUrl: string = import.meta.env
             .VITE_CHALLENGE_URL as string;
@@ -151,115 +167,22 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
         }
       } catch (e) {
         console.error(e);
-      }finally{
+      } finally {
         setIsLoading(false);
+        if (action === 'otp') {
+          setVisibleModal(false);
+        }
       }
     } else {
       console.error("Formulario inválido. Por favor, corrija los errores.");
     }
   };
-  // #endregion
+  
+  const onSubmit = (e: any) => handleSubmit(e, 'submit');
+  
+  const onSendDataWithOtp = (e: any) => handleSubmit(e, 'otp');
 
-  const sendDataWithOtp = async () => {
-    let response: responseppx | undefined;
-    try {
-      const apiService = new ApiService(
-        config.setting.authorization,
-        config.setting.simetricKey
-      );
-      response = await apiService.post(
-        services.service_bridge,
-        payload as payloadppx
-      );
-      setResponse(response);
-      /**
-       * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
-       */
-      if (response?.code == 103) {
-        //validator 3ds
-        const challengeUrl: any = response.data?.detail?.url;
-        const params: any = response.data.detail.parameters;
-        const queryParams = params
-          .map(
-            (param: any) =>
-              `${encodeURIComponent(param.name)}=${encodeURIComponent(
-                param.value
-              )}`
-          )
-          .join("&");
 
-        const fullUrl: string = `${challengeUrl}&${queryParams}`;
-        const redirectUrl: string = import.meta.env
-          .VITE_CHALLENGE_URL as string;
-        window.location.href = `${redirectUrl}?challengeUrl=${encodeURIComponent(
-          fullUrl
-        )}`;
-      } else if (response?.code === 100) {
-        //otp validacion
-        setVisibleModal(true);
-      } else if (response?.code === 0) {
-        //respuesta ok :)
-        onRedirect(config.redirect_url, response.data);
-      } else if (response?.code === 3) {
-        console.error("Credenciales de establecimiento no encontradas");
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setVisibleModal(false);
-    }
-  };
-
-  // #region PARSEPAYLOAD
-  const convertToPayload = (): Promise<payloadppx> => {
-    return new Promise((resolve, reject) => {
-      try {
-        const [expiryMonth, expiryYear] =
-          formData.card.expirationDate.value.split("/");
-        const rawKey = config.setting.secretKey;
-        const encriptor = new Encryptor(rawKey);
-        const cardNumber = encriptor.encrypt(formData.card.number.value);
-        const expiryMonthEncrypted = encriptor.encrypt(expiryMonth);
-        const expiryYearEncrypted = encriptor.encrypt(expiryYear);
-        const cvvEncrypted = encriptor.encrypt(formData.card.cvv.value);
-
-        const payload: payloadppx = {
-          card: {
-            number: cardNumber,
-            name: config.buyer?.names,
-            expirationMonth: expiryMonthEncrypted,
-            expirationYear: expiryYearEncrypted,
-            cvv: cvvEncrypted,
-          },
-          buyer: {
-            documentNumber: config.buyer?.identity,
-            firstName: config.buyer.names,
-            lastName: config.buyer.lastnames,
-            phone: `${config.buyer.countrycode}${config.buyer.phonenumber}`,
-            email: config.buyer.email,
-          },
-          shippingAddress: {
-            country: config.shipping_address.country,
-            city: config.shipping_address.city,
-            street: config.shipping_address.street,
-            number: config.shipping_address.Zipcode,
-          },
-          paramsRecurrent: {},
-          currency: config.currency,
-          description: "registrar tarjeta",
-          clientIp: config.buyer.ipaddress,
-          idEstablecimiento: btoa(config.setting.code),
-          urlRetorno3ds: config.redirect_url,
-          urlRetornoExterno: config.redirect_url,
-        };
-        setPayload(payload);
-        resolve(payload);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  };
-  // #endregion
   const onRedirect = (url: string, data: any) => {
     const baseUrl = url;
     const queryParams = new URLSearchParams(data).toString();
@@ -269,8 +192,6 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const resendOtp = () =>{
     setVisibleModal(false);
     setResendModal(true)
-    //limpiar todos los datos
-    
   }
   //#region JSX
   return (
@@ -278,9 +199,20 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
       <OtpModal
       onResendOtp={resendOtp}
         open={isVisibleModal}
-        onAction={sendDataWithOtp}
+        onAction={onSendDataWithOtp}
         onOtpChange={handleOtp}
       ></OtpModal>
+      <div class='ppxiis-row'>
+      <div class="ppxiss-col ppxiss-align-center ppxiss-card-brand-padding">
+          <span class='ppxis-text-align-center ppxiss-text-header-info'>
+              Estás realizando un pago para
+              <br />
+          <span class='ppxis-text-align-center ppxiss-text-header-info ppxiss-text-strong'>
+                {config.business.name}
+          </span>
+          </span> 
+        </div>
+      </div>
       <div class="ppxiss-row">
         <div class="ppxiss-col ppxiss-align-center ppxiss-card-brand-padding">
           <CardBrand
@@ -290,7 +222,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           />
         </div>
       </div>
-      <form class="ppxiss-row" onSubmit={handleSubmit}>
+      <form class="ppxiss-row" onSubmit={onSubmit}>
         <div class="ppxiss-col">
           <ValidatedInput
              reset={clearValue}
@@ -299,11 +231,12 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             onChange={handleInputChange}
             label="Número de tarjeta"
             name="number"
+            placeholder="XXXX XXXX XXXX XXXX"
             value={formData.card.number.value}
           ></ValidatedInput>
 
           <div class="ppxiss-row">
-            <div class="ppxiss-col ppxiss-col-6">
+            <div class="ppxiss-col ppxiss-col-6" style={{paddingRight:'5px'}}>
               <ValidateDateInput
                 reset={clearValue}
                 validator={validateExpiryDate}
@@ -314,7 +247,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 value={formData.card.expirationDate.value}
               ></ValidateDateInput>
             </div>
-            <div class="ppxiss-col ppxiss-col-6">
+            <div class="ppxiss-col ppxiss-col-6" style={{paddingLeft:'5px'}}>
               <ValidateCvvInput
                 reset={resendModal || clearValue}
                 validator={validateCVV}
@@ -326,34 +259,40 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
               ></ValidateCvvInput>
             </div>
           </div>
-          <div class='ppxiss-row'>
+          <div class='ppxiss-row'style={{marginBottom:'16px'}}>
             <div class='ppxiss-col'>
-              <ValidatedDropdown
-                validator={(value) => value !== ""}
-                errorMessage="Seleccione una opción"
-                onChange={handleInputChange}
+              <BasicSelect
                 label="Tipo de Crédito"
                 name="creditType"
-                options={[
-                  { key: "1", value: "Crédito" },
-                  { key: "2", value: "Débito" },
-                ]}
-                initialValue={formData.card.creditType.value}
+                onChange={handleInputChange}
+                validator={(value) => value !== ""}
+                errorMessage="Seleccione una opción"
+                options={config.installmentCredit as any}
               >
-              </ValidatedDropdown>
+              </BasicSelect>
             </div>
           </div>
+          {isDefer && (<div class='ppxiss-row'style={{marginBottom:'16px'}}>
+            <div class='ppxiss-col'>
+              <BasicSelect
+                label="Diferido"
+                name="deferPay"
+                onChange={handleInputChange}
+                validator={(value) => value !== ""}
+                errorMessage="Seleccione una opción"
+                options={deferOptions as any}
+              >
+              </BasicSelect>
+            </div>
+          </div>)}
           <div class='ppxiss-row'>
             <div class='ppxiss-col ppxiss-align-center'>
-            <button
-            type="submit"
-            className={`ppxiss-button-payiss-pay ${
-              isFormValid()  && !isLoading ? "ppxiss-button-active" : "ppxiss-button-inactive"
-            }`}
-            disabled={!isFormValid() || isLoading}
+          <SubmitButton
+            activeButton={()=>isFormValid() && !isLoading}
+            disabledButton={()=>!isFormValid() || isLoading}
           >
-            <span>{config.module==='TOKENIZATION'?'Registrar tarjeta':`Pagar ${config.total_amount} ${config.currency}`}</span>
-          </button>
+            <span>{config.module === 'TOKENIZATION' ? 'Registrar tarjeta' : `Pagar ${config.total_amount} ${config.currency}`}</span>
+          </SubmitButton>
             </div>
           </div>
           <div class='ppxiss-row'>

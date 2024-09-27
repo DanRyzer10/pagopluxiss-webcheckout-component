@@ -1,6 +1,6 @@
 import { useState, useCallback,useEffect } from 'preact/hooks';
 
-export const ValidatedInput = ({ validator, errorMessage, onChange, name,label, reset,value: initialValue = '' }:any) => {
+export const ValidatedInput = ({ validator, errorMessage, onChange, name,label, reset,placeholder,value: initialValue = '' }:any) => {
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState('');
 
@@ -33,7 +33,7 @@ export const ValidatedInput = ({ validator, errorMessage, onChange, name,label, 
         type="text"
         value={value}
         onInput={handleChange}
-        placeholder='xxxx xxxx xxxx xxxx'
+        placeholder={placeholder}
         className={`ppxiss-input-component ${error ? 'ppxiss-input-component-error' : 'ppxiss-input-component-ok'}`}
       />
       {error && <p className="ppxiss-message-errors">{error}</p>}
