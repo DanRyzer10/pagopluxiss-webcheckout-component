@@ -24,21 +24,22 @@ import BasicSelect from "./components/material/MultiselectOption";
 import { SubmitButton } from "./components/SubmitButton";
 import useConvertToPayload from "./hooks/useConvertPayload";
 import { convertToDeferredOptions } from "./utils/mapers";
+import { IFormData } from "./types/IFormData";
 
 // #endregion
 
 // #region COMPONENT APP
 export function PaymentButton({ config, services }: PaymentButtonProps) {
   // #region variables reactivas
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IFormData>({
     card: {
       number: { value: "", isValid: false },
       expirationDate: { value: "", isValid: false },
       cvv: { value: "", isValid: false },
       creditType: {
-        value: { code: "", installments: [], name: "" },
+        value: "",
         isValid: false,
-      } as creditTypeValue,
+      },
     },
   });
   const [payload, setPayload] = useState<payloadppx>();
@@ -70,8 +71,17 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
         convertToDeferredOptions(installments);
       setDeferOptions(installmentOptions);
       setisDefer(true);
+      setFormData((prevData) => ({
+        card: {
+          ...prevData.card,
+          deferPay: { value: "", isValid: false },
+        },
+      }));
     } else {
       setisDefer(false);
+      //quitar deferPay del formData
+      const { deferPay, ...rest } = formData.card;
+      setFormData({ card: rest });
     }
   }, [selectedCreditType]);
   useEffect(() => {
@@ -82,11 +92,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           expirationDate: { value: "", isValid: false },
           cvv: { value: "", isValid: false },
           creditType: {
-            value: {
-              code: "",
-              installments: [],
-              name: "",
-            },
+            value: "",
             isValid: false,
           },
         },
