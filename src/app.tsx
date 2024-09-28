@@ -10,11 +10,7 @@ import { ValidatedInput } from "./components/ValidateInput";
 import { ValidateDateInput } from "./components/ValidateDateInput";
 import { ValidateCvvInput } from "./components/ValidateCvvInput";
 import { OtpModal } from "./components/OtpModal";
-import {
-  PaymentButtonProps,
-  creditTypeValue,
-  IDeferOptions,
-} from "./types/appTypes";
+import { PaymentButtonProps, IDeferOptions } from "./types/appTypes";
 import { payloadppx } from "./config/types/payloadPagoplux";
 import { ApiService } from "./services/api.service";
 import { responseppx } from "./config/types/responseApi";
@@ -25,6 +21,7 @@ import { SubmitButton } from "./components/SubmitButton";
 import useConvertToPayload from "./hooks/useConvertPayload";
 import { convertToDeferredOptions } from "./utils/mapers";
 import { IFormData } from "./types/IFormData";
+import { SplitInfoInput } from "./components/SplitInfoInput";
 
 // #endregion
 
@@ -51,6 +48,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const [otp, setOtp] = useState("");
   const [isDefer, setisDefer] = useState(false);
   const [deferOptions, setDeferOptions] = useState<IDeferOptions[]>([]);
+  //const [showMore, setShowMore] = useState(false);
   const [selectedCreditType, setSelectedCreditType] = useState<{
     code: string;
     installments: number[];
@@ -210,6 +208,9 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const onSubmit = (e: any) => handleSubmit(e, "submit");
 
   const onSendDataWithOtp = (e: any) => handleSubmit(e, "otp");
+  const onShowMoreInfo = () => {
+    console.log("show more info");
+  };
 
   const onRedirect = (url: string, data: any) => {
     const baseUrl = url;
@@ -248,6 +249,17 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             expiredDate={formData.card.expirationDate.value}
             names={config.buyer?.names}
           />
+        </div>
+      </div>
+      <div class="ppxiss-row">
+        <div class="ppxiss-col">
+          <SplitInfoInput
+            onChange={onShowMoreInfo}
+            value={{
+              ...config.buyer,
+              ...config.shipping_address,
+            }}
+          ></SplitInfoInput>
         </div>
       </div>
       <form class="ppxiss-row" onSubmit={onSubmit}>
@@ -317,6 +329,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
               </div>
             </div>
           )}
+
           <div class="ppxiss-row">
             <div class="ppxiss-col ppxiss-align-center">
               <SubmitButton
