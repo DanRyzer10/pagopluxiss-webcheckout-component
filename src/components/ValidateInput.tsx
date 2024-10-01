@@ -8,6 +8,7 @@ export const ValidatedInput = ({
   label,
   reset,
   placeholder,
+  type,
   value: initialValue = "",
   isValid: initialIsValid = true,
 }: any) => {
@@ -27,7 +28,7 @@ export const ValidatedInput = ({
       }
       setError(errorMsg);
 
-      onChange(name, newValue, isValid);
+      onChange(name, newValue, isValid, type || "card");
     },
     [validator, errorMessage, onChange, name]
   );

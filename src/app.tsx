@@ -152,8 +152,8 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
         },
         buyer: prevData.buyer,
       }));
-      handleInputChange("cvv", "", false);
-      console.log(formData);
+      handleInputChange("cvv", "", false, "card");
+      setResendModal(false);
     }
   }, [resendModal]);
   // #endregion
@@ -162,14 +162,17 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
     setOtp(otp);
   };
   const handleInputChange = useCallback(
-    (name: any, value: any, isValid: any) => {
+    (
+      name: any,
+      value: any,
+      isValid: any,
+      target: "card" | "buyer" = "card"
+    ) => {
+      //@ts-ignore
       setFormData((prevData: any) => ({
-        card: {
-          ...prevData.card,
-          [name]: { value, isValid },
-        },
-        buyer: {
-          ...prevData.buyer,
+        ...prevData,
+        [target]: {
+          ...prevData[target as any],
           [name]: { value, isValid },
         },
       }));
@@ -272,6 +275,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   }, [showMoreInfo]);
 
   const onRedirect = (url: string, data: any) => {
+    setClearValue(true);
     const baseUrl = url;
     const queryParams = new URLSearchParams(data).toString();
     const fullUrl = `${baseUrl}?${queryParams}`;
@@ -304,8 +308,8 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
       <div class="ppxiss-row">
         <div class="ppxiss-col ppxiss-align-center ppxiss-card-brand-padding">
           <CardBrand
-            cardNumber={formData.card.number.value}
-            expiredDate={formData.card.expirationDate.value}
+            cardNumber={formData?.card?.number?.value || ""}
+            expiredDate={formData?.card?.expirationDate.value || ""}
             names={config.buyer?.names}
           />
         </div>
@@ -328,6 +332,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           <label className="float-label">Propietario de Tarjeta</label>
           <div class="ppxiss-col">
             <ValidatedInput
+              type="buyer"
               validator={cityIdValidation}
               errorMessage="Número de identificacion inválido"
               onChange={handleInputChange}
@@ -343,6 +348,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingRight: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   reset={clearValue}
                   validator={validateOnlyLetters}
                   errorMessage="Nombre inválido"
@@ -359,6 +365,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingLeft: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   reset={clearValue}
                   validator={validateOnlyLetters}
                   errorMessage="Apellido inválido"
@@ -378,6 +385,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingRight: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   validator={validateExpiryDate}
                   errorMessage="requerido"
                   onChange={handleInputChange}
@@ -393,6 +401,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingLeft: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   reset={resendModal || clearValue}
                   validator={validatePhoneNumber}
                   errorMessage="Número invalido"
@@ -406,6 +415,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
             </div>
 
             <ValidatedInput
+              type="buyer"
               reset={clearValue}
               validator={validateEmail}
               errorMessage="Correo inválido"
@@ -423,6 +433,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingRight: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   reset={clearValue}
                   validator={validateOnlyLetters}
                   errorMessage="Ciudad inválida"
@@ -439,6 +450,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingLeft: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   reset={clearValue}
                   validator={validateLettersWithPoints}
                   errorMessage="Direccion invalida"
@@ -458,6 +470,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingRight: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   reset={clearValue}
                   validator={validateLettersWithPoints}
                   errorMessage="Calle inválida"
@@ -474,6 +487,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 style={{ paddingLeft: "5px" }}
               >
                 <ValidatedInput
+                  type="buyer"
                   reset={clearValue}
                   validator={validateZipCode}
                   errorMessage="Codigo postal inválido"
@@ -492,6 +506,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
         <form id="ppxiss-car-form" class="ppxiss-row" onSubmit={onSubmit}>
           <div class="ppxiss-col">
             <ValidatedInput
+              type="card"
               reset={clearValue}
               validator={validateCardNumber}
               errorMessage="Número de tarjeta inválida"
