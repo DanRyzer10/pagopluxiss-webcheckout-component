@@ -215,14 +215,52 @@ display: flex;
   background: linear-gradient(0deg, #1D3AA0 0%, #0085FF 100%);
   cursor: pointer;
 }
+.ppxiss-moreinfo-container{
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid #DADADA;
+  padding: 10px 0;
+}
+.float-label {
+  position: absolute;
+  top: -6px;
+  left: 18px; /* Ajusta este valor según sea necesario */
+  font-size: 12px; /* Ajusta el tamaño de la fuente según sea necesario */
+  color: #DADADA; 
+  font-size: 11px;
+  font-weight: 500;
+  z-index: 10;
+  background-color: white;/* Ajusta el color según sea necesario */
+}
 .ppx-iss-button-container{
   display: flex;
   justify-content: center;
+}
+.ppxiss-button-split-info{
+  font-size: 12px;
+  position: absolute;
+  top: 17px;
+  left: 235px;
+  background-color: white;
+  border: none;
+  font-weight: 500;
+  color: #1D3AA0;
+  cursor: pointer;
 }
 .ppx-iss-input-label{
   z-index: 10;
   bottom: 42px;
   left: 15px;
+  background-color: white;
+  font-size: 11px;
+  font-weight: 500;
+  position: absolute;
+  color: #DADADA;
+}
+.ppx-iss-input-label-textarea{
+  z-index: 10;
+  bottom: 61px;
+  left: 32px;
   background-color: white;
   font-size: 11px;
   font-weight: 500;

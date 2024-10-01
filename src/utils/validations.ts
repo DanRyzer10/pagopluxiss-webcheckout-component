@@ -25,12 +25,18 @@ export function validateEmail(email:string) {
     const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return regex.test(email);
 }
+export  function validateLettersWithPoints(text:string){
+    //validar solo letras y puntos y espacios
+    const regex = /^[A-Za-z\s\.\,]+$/;
+    return regex.test(text);
+}
 export function validatePhoneNumber(phooneNumber:string){
-    const regex = /^\d{10}$/;
+    //validar de 8 a 12 digitos
+    const regex = /^\d{8,12}$/;
     return regex.test(phooneNumber);
 }
 export function validateZipCode(zipCode:string){
-    const regex = /^\d{6}$/;
+    const regex = /^(?:[A-Z0-9]+([- ]?[A-Z0-9]+)*)?$/;
     return regex.test(zipCode);
 }
 export function validateIdentificationNumber(idNumber:string,type:string){

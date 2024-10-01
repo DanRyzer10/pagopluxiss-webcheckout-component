@@ -1,10 +1,15 @@
 // #region IMPORTS
-import { useEffect, useState } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import SvgIcon from "./img/issLogo";
 import {
   validateCardNumber,
   validateCVV,
+  validateEmail,
   validateExpiryDate,
+  validateLettersWithPoints,
+  validateOnlyLetters,
+  validatePhoneNumber,
+  validateZipCode,
 } from "./utils/validations";
 import { ValidatedInput } from "./components/ValidateInput";
 import { ValidateDateInput } from "./components/ValidateDateInput";
@@ -22,6 +27,7 @@ import useConvertToPayload from "./hooks/useConvertPayload";
 import { convertToDeferredOptions } from "./utils/mapers";
 import { IFormData } from "./types/IFormData";
 import { SplitInfoInput } from "./components/SplitInfoInput";
+import cityIdValidation from "./utils/cityIdValidation";
 
 // #endregion
 
@@ -38,6 +44,53 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
         isValid: false,
       },
     },
+    buyer: {
+      name: {
+        value: config.buyer.names,
+        isValid: validateOnlyLetters(config.buyer.names),
+      },
+      lastName: {
+        value: config.buyer.lastnames,
+        isValid: validateOnlyLetters(config.buyer.lastnames),
+      },
+      email: {
+        value: config.buyer.email,
+        isValid: validateEmail(config.buyer.email),
+      },
+      phone: {
+        value: config.buyer.phonenumber,
+        isValid: validatePhoneNumber(config.buyer.phonenumber),
+      },
+      address: {
+        value: config.shipping_address.state,
+        isValid: validateLettersWithPoints(config.shipping_address.state),
+      },
+      city: {
+        value: config.shipping_address.city,
+        isValid: validateLettersWithPoints(config.shipping_address.city),
+      },
+      state: {
+        value: config.shipping_address.state,
+        isValid: validateLettersWithPoints(config.shipping_address.state),
+      },
+      countryCode: {
+        value: config.buyer.countrycode,
+        isValid: validateLettersWithPoints(config.shipping_address.country),
+      },
+      street: {
+        value: config.shipping_address.street,
+        isValid: validateLettersWithPoints(config.shipping_address.street),
+      },
+      zipCode: {
+        value: config.shipping_address.Zipcode,
+        isValid: validateZipCode(config.shipping_address.Zipcode),
+      },
+      idNumber: {
+        value: config.buyer.identity,
+        isValid: cityIdValidation(config.buyer.identity),
+      },
+      idType: { value: config.buyer.document_type, isValid: true },
+    },
   });
   const [payload, setPayload] = useState<payloadppx>();
   const [resendModal, setResendModal] = useState(false);
@@ -47,6 +100,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const [clearValue, setClearValue] = useState(false);
   const [otp, setOtp] = useState("");
   const [isDefer, setisDefer] = useState(false);
+  const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [deferOptions, setDeferOptions] = useState<IDeferOptions[]>([]);
   //const [showMore, setShowMore] = useState(false);
   const [selectedCreditType, setSelectedCreditType] = useState<{
@@ -64,6 +118,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   useEffect(() => {
     if (!selectedCreditType) return;
     let installments: any[] = selectedCreditType.installments;
+    console.log(formData);
     if (installments.length > 0) {
       const installmentOptions: IDeferOptions[] =
         convertToDeferredOptions(installments);
@@ -74,31 +129,15 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           ...prevData.card,
           deferPay: { value: "", isValid: false },
         },
+        buyer: prevData.buyer,
       }));
     } else {
       setisDefer(false);
-      //quitar deferPay del formData
       const { deferPay, ...rest } = formData.card;
-      setFormData({ card: rest });
+      const { buyer } = formData;
+      setFormData({ card: rest, buyer });
     }
   }, [selectedCreditType]);
-  useEffect(() => {
-    return () => {
-      setFormData({
-        card: {
-          number: { value: "", isValid: false },
-          expirationDate: { value: "", isValid: false },
-          cvv: { value: "", isValid: false },
-          creditType: {
-            value: "",
-            isValid: false,
-          },
-        },
-      });
-      setClearValue(true);
-      setOtp("");
-    };
-  }, []);
   useEffect(() => {
     if (resendModal) {
       setFormData((prevData) => ({
@@ -111,9 +150,10 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           cvv: { value: "", isValid: false },
           creditType: { value: prevData.card.creditType.value, isValid: true },
         },
+        buyer: prevData.buyer,
       }));
-      console.log(formData);
       handleInputChange("cvv", "", false);
+      console.log(formData);
     }
   }, [resendModal]);
   // #endregion
@@ -121,17 +161,36 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const handleOtp = (otp: any) => {
     setOtp(otp);
   };
-  const handleInputChange = (name: any, value: any, isValid: any) => {
-    setFormData((prevData) => ({
-      card: {
-        ...prevData.card,
-        [name]: { value, isValid },
-      },
-    }));
-  };
+  const handleInputChange = useCallback(
+    (name: any, value: any, isValid: any) => {
+      setFormData((prevData: any) => ({
+        card: {
+          ...prevData.card,
+          [name]: { value, isValid },
+        },
+        buyer: {
+          ...prevData.buyer,
+          [name]: { value, isValid },
+        },
+      }));
+    },
+    [setFormData]
+  );
   const isFormValid = () => {
-    return Object.values(formData.card).every((field) => field.isValid);
+    return (
+      formData.card &&
+      formData.buyer &&
+      Object.values(formData.card).every((field) => field.isValid) &&
+      Object.values(formData.buyer).every((field) => field.isValid)
+    );
   };
+  const validateBuyerInfo = useMemo(() => {
+    console.log(formData.buyer);
+    return (
+      formData.buyer &&
+      Object.values(formData.buyer).every((field) => field.isValid)
+    );
+  }, [formData.buyer]);
   const ConvertToPayload = useConvertToPayload(formData, config, setPayload);
   // #region POSTDATA FORM
   const handleSubmit = async (e: any, action: "submit" | "otp") => {
@@ -208,9 +267,9 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const onSubmit = (e: any) => handleSubmit(e, "submit");
 
   const onSendDataWithOtp = (e: any) => handleSubmit(e, "otp");
-  const onShowMoreInfo = () => {
-    console.log("show more info");
-  };
+  const onShowMoreInfo = useCallback(() => {
+    setShowMoreInfo(!showMoreInfo);
+  }, [showMoreInfo]);
 
   const onRedirect = (url: string, data: any) => {
     const baseUrl = url;
@@ -254,6 +313,8 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
       <div class="ppxiss-row">
         <div class="ppxiss-col">
           <SplitInfoInput
+            invalid={!validateBuyerInfo}
+            label="Propietario de la Tarjeta"
             onChange={onShowMoreInfo}
             value={{
               ...config.buyer,
@@ -262,98 +323,266 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           ></SplitInfoInput>
         </div>
       </div>
-      <form class="ppxiss-row" onSubmit={onSubmit}>
-        <div class="ppxiss-col">
-          <ValidatedInput
-            reset={clearValue}
-            validator={validateCardNumber}
-            errorMessage="Número de tarjeta inválida"
-            onChange={handleInputChange}
-            label="Número de tarjeta"
-            name="number"
-            placeholder="XXXX XXXX XXXX XXXX"
-            value={formData.card.number.value}
-          ></ValidatedInput>
+      {showMoreInfo ? (
+        <div className="ppxiss-moreinfo-container ppxiss-row ">
+          <label className="float-label">Propietario de Tarjeta</label>
+          <div class="ppxiss-col">
+            <ValidatedInput
+              validator={cityIdValidation}
+              errorMessage="Número de identificacion inválido"
+              onChange={handleInputChange}
+              label="Cédula, RUC o Pasaporte"
+              name="idNumber"
+              placeholder="Ingrese su numero de identificacion"
+              value={formData.buyer?.idNumber.value}
+              isValid={formData.buyer?.idNumber.isValid}
+            ></ValidatedInput>
+            <div class="ppxiss-row">
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingRight: "5px" }}
+              >
+                <ValidatedInput
+                  reset={clearValue}
+                  validator={validateOnlyLetters}
+                  errorMessage="Nombre inválido"
+                  onChange={handleInputChange}
+                  label="Nombre"
+                  name="name"
+                  placeholder="Nombre"
+                  value={formData.buyer?.name.value}
+                  isValid={formData.buyer?.name.isValid}
+                ></ValidatedInput>
+              </div>
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingLeft: "5px" }}
+              >
+                <ValidatedInput
+                  reset={clearValue}
+                  validator={validateOnlyLetters}
+                  errorMessage="Apellido inválido"
+                  onChange={handleInputChange}
+                  label="Apellido"
+                  name="lastName"
+                  placeholder="Nombre"
+                  value={formData.buyer?.lastName.value}
+                  isValid={formData.buyer?.lastName.isValid}
+                ></ValidatedInput>
+              </div>
+            </div>
 
-          <div class="ppxiss-row">
-            <div
-              class="ppxiss-col ppxiss-col-6"
-              style={{ paddingRight: "5px" }}
-            >
-              <ValidateDateInput
-                reset={clearValue}
-                validator={validateExpiryDate}
-                errorMessage="Fecha de expiración inválida"
-                onChange={handleInputChange}
-                label="Fecha de expiración"
-                name="expirationDate"
-                value={formData.card.expirationDate.value}
-              ></ValidateDateInput>
+            <div class="ppxiss-row">
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingRight: "5px" }}
+              >
+                <ValidatedInput
+                  validator={validateExpiryDate}
+                  errorMessage="requerido"
+                  onChange={handleInputChange}
+                  label="País"
+                  name="contryCode"
+                  placeholder="Ingrese su país"
+                  value={formData.buyer?.countryCode.value}
+                  isValid={formData.buyer?.countryCode.isValid}
+                ></ValidatedInput>
+              </div>
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingLeft: "5px" }}
+              >
+                <ValidatedInput
+                  reset={resendModal || clearValue}
+                  validator={validatePhoneNumber}
+                  errorMessage="Número invalido"
+                  onChange={handleInputChange}
+                  label="Celular"
+                  name="phone"
+                  value={formData.buyer?.phone.value}
+                  isValid={formData.buyer?.phone.isValid}
+                ></ValidatedInput>
+              </div>
             </div>
-            <div class="ppxiss-col ppxiss-col-6" style={{ paddingLeft: "5px" }}>
-              <ValidateCvvInput
-                reset={resendModal || clearValue}
-                validator={validateCVV}
-                errorMessage="CVV inválido"
-                onChange={handleInputChange}
-                label="CVV"
-                name="cvv"
-                value={formData.card.cvv.value}
-              ></ValidateCvvInput>
+
+            <ValidatedInput
+              reset={clearValue}
+              validator={validateEmail}
+              errorMessage="Correo inválido"
+              onChange={handleInputChange}
+              label="Correo"
+              name="email"
+              placeholder="Ingrese su correo electronico"
+              value={formData.buyer?.email.value}
+              isValid={formData.buyer?.email.isValid}
+            ></ValidatedInput>
+
+            <div class="ppxiss-row">
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingRight: "5px" }}
+              >
+                <ValidatedInput
+                  reset={clearValue}
+                  validator={validateOnlyLetters}
+                  errorMessage="Ciudad inválida"
+                  onChange={handleInputChange}
+                  label="Ciudad"
+                  name="clientCity"
+                  placeholder="Ingrese su ciudad"
+                  value={formData.buyer?.city.value}
+                  isValid={formData.buyer?.city.isValid}
+                ></ValidatedInput>
+              </div>
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingLeft: "5px" }}
+              >
+                <ValidatedInput
+                  reset={clearValue}
+                  validator={validateLettersWithPoints}
+                  errorMessage="Direccion invalida"
+                  onChange={handleInputChange}
+                  label="Dirección"
+                  name="clientAddress"
+                  placeholder="Ingrese su dirección"
+                  value={formData.buyer?.state.value}
+                  isValid={formData.buyer?.state.isValid}
+                ></ValidatedInput>
+              </div>
+            </div>
+
+            <div class="ppxiss-row">
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingRight: "5px" }}
+              >
+                <ValidatedInput
+                  reset={clearValue}
+                  validator={validateLettersWithPoints}
+                  errorMessage="Calle inválida"
+                  onChange={handleInputChange}
+                  label="Calle principal"
+                  name="clientStreet"
+                  placeholder="Ingrese su calle principal"
+                  value={formData.buyer?.street.value}
+                  isValid={formData.buyer?.street.isValid}
+                ></ValidatedInput>
+              </div>
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingLeft: "5px" }}
+              >
+                <ValidatedInput
+                  reset={clearValue}
+                  validator={validateZipCode}
+                  errorMessage="Codigo postal inválido"
+                  onChange={handleInputChange}
+                  label="Código Postal"
+                  name="clientZipCode"
+                  placeholder="Ingrese su codigo postal"
+                  value={formData.buyer?.zipCode.value}
+                  isValid={formData.buyer?.zipCode.isValid}
+                ></ValidatedInput>
+              </div>
             </div>
           </div>
-          <div class="ppxiss-row" style={{ marginBottom: "16px" }}>
-            <div class="ppxiss-col">
-              <BasicSelect
-                label="Tipo de Crédito"
-                name="creditType"
-                onChange={handleInputChange}
-                validator={(value) => value !== ""}
-                errorMessage="Seleccione una opción"
-                options={config.installmentCredit as any}
-                onSendSelectedValue={handleSelectedCreditType}
-              ></BasicSelect>
+        </div>
+      ) : (
+        <form id="ppxiss-car-form" class="ppxiss-row" onSubmit={onSubmit}>
+          <div class="ppxiss-col">
+            <ValidatedInput
+              reset={clearValue}
+              validator={validateCardNumber}
+              errorMessage="Número de tarjeta inválida"
+              onChange={handleInputChange}
+              label="Número de tarjeta"
+              name="number"
+              placeholder="XXXX XXXX XXXX XXXX"
+              value={formData.card.number.value}
+            ></ValidatedInput>
+
+            <div class="ppxiss-row">
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingRight: "5px" }}
+              >
+                <ValidateDateInput
+                  reset={clearValue}
+                  validator={validateExpiryDate}
+                  errorMessage="Fecha de expiración inválida"
+                  onChange={handleInputChange}
+                  label="Fecha de expiración"
+                  name="expirationDate"
+                  value={formData.card.expirationDate.value}
+                ></ValidateDateInput>
+              </div>
+              <div
+                class="ppxiss-col ppxiss-col-6"
+                style={{ paddingLeft: "5px" }}
+              >
+                <ValidateCvvInput
+                  reset={resendModal || clearValue}
+                  validator={validateCVV}
+                  errorMessage="CVV inválido"
+                  onChange={handleInputChange}
+                  label="CVV"
+                  name="cvv"
+                  value={formData.card.cvv.value}
+                ></ValidateCvvInput>
+              </div>
             </div>
-          </div>
-          {isDefer && (
             <div class="ppxiss-row" style={{ marginBottom: "16px" }}>
               <div class="ppxiss-col">
                 <BasicSelect
-                  label="Diferido"
-                  name="deferPay"
+                  label="Tipo de Crédito"
+                  name="creditType"
                   onChange={handleInputChange}
                   validator={(value) => value !== ""}
                   errorMessage="Seleccione una opción"
-                  options={deferOptions as any}
+                  options={config.installmentCredit as any}
+                  onSendSelectedValue={handleSelectedCreditType}
                 ></BasicSelect>
               </div>
             </div>
-          )}
+            {isDefer && (
+              <div class="ppxiss-row" style={{ marginBottom: "16px" }}>
+                <div class="ppxiss-col">
+                  <BasicSelect
+                    label="Diferido"
+                    name="deferPay"
+                    onChange={handleInputChange}
+                    validator={(value) => value !== ""}
+                    errorMessage="Seleccione una opción"
+                    options={deferOptions as any}
+                  ></BasicSelect>
+                </div>
+              </div>
+            )}
+          </div>
+        </form>
+      )}
 
-          <div class="ppxiss-row">
-            <div class="ppxiss-col ppxiss-align-center">
-              <SubmitButton
-                activeButton={() => isFormValid() && !isLoading}
-                disabledButton={() => !isFormValid() || isLoading}
-              >
-                <span>
-                  {config.module === "TOKENIZATION"
-                    ? "Registrar tarjeta"
-                    : `Pagar ${config.total_amount} ${config.currency}`}
-                </span>
-              </SubmitButton>
-            </div>
-          </div>
-          <div class="ppxiss-row">
-            <div class="ppxiss-col ppxiss-align-center">
-              <SvgIcon></SvgIcon>
-            </div>
-          </div>
-          {/* <div>
-          {config.setting.production ?(<div></div>):(<div>Entorno de pruebas xdxd</div>)}
-          </div> */}
+      <div class="ppxiss-row">
+        <div class="ppxiss-col ppxiss-align-center">
+          <SubmitButton
+            form="ppxiss-car-form"
+            activeButton={() => (isFormValid() as boolean) && !isLoading}
+            disabledButton={() => !isFormValid() || isLoading}
+          >
+            <span>
+              {config.module === "TOKENIZATION"
+                ? "Registrar tarjeta"
+                : `Pagar ${config.total_amount} ${config.currency}`}
+            </span>
+          </SubmitButton>
         </div>
-      </form>
+      </div>
+      <div class="ppxiss-row">
+        <div class="ppxiss-col ppxiss-align-center">
+          <SvgIcon></SvgIcon>
+        </div>
+      </div>
     </div>
   );
 }

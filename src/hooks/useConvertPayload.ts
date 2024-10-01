@@ -3,9 +3,10 @@ import { config } from "../config/types/setup";
 import { useCallback } from "preact/hooks";
 import { Payload } from "../types/payloadType";
 import Encryptor from "../utils/encryptor";
+import { IFormData } from "../types/IFormData";
 
 const useConvertToPayload = (
-    formData: any,
+    formData: IFormData,
     config: config,
     setPayload: (payload: Payload) => void
   ) => {
@@ -30,17 +31,17 @@ const useConvertToPayload = (
               cvv: cvvEncrypted,
             },
             buyer: {
-              documentNumber: config.buyer?.identity,
-              firstName: config.buyer.names,
-              lastName: config.buyer.lastnames,
-              phone: `${config.buyer.countrycode}${config.buyer.phonenumber}`,
-              email: config.buyer.email,
+              documentNumber: formData.buyer?.idNumber.value as string,
+              firstName: formData.buyer?.name.value as string,
+              lastName: formData.buyer?.lastName.value as string,
+              phone: `${formData.buyer?.countryCode.value}${formData.buyer?.phone.value}`,
+              email: formData.buyer?.email.value as string,
             },
             shippingAddress: {
               country: config.shipping_address.country,
-              city: config.shipping_address.city,
-              street: config.shipping_address.street,
-              number: config.shipping_address.Zipcode,
+              city: formData.buyer?.city.value as string,
+              street: formData.buyer?.street.value as string,
+              number: formData.buyer?.zipCode.value as string,
             },
             paramsRecurrent: {},
             currency: config.currency,
