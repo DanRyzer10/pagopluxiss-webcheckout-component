@@ -19,7 +19,7 @@ export default defineConfig({
   build:{
     rollupOptions:{
       output:{
-        entryFileNames:'iss-payment-button.js'
+        entryFileNames:'checkout.js'
       }
     },
     cssCodeSplit:false
