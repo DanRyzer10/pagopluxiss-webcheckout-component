@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import SvgIcon from "./img/issLogo";
 import {
   validateCardNumber,
+  validateCountrieSelection,
   validateCVV,
   validateEmail,
   validateExpiryDate,
@@ -21,13 +22,16 @@ import { ApiService } from "./services/api.service";
 import { responseppx } from "./config/types/responseApi";
 import { CardBrand } from "./components/cardBrand";
 import "./app.css";
-import BasicSelect from "./components/material/MultiselectOption";
 import { SubmitButton } from "./components/SubmitButton";
 import useConvertToPayload from "./hooks/useConvertPayload";
 import { convertToDeferredOptions } from "./utils/mapers";
 import { IFormData } from "./types/IFormData";
 import { SplitInfoInput } from "./components/SplitInfoInput";
 import cityIdValidation from "./utils/cityIdValidation";
+
+import useFindCountrieByNumber from "./api/use-find-countrie-by-number";
+import BasicSelect from "./components/material/MultiselectOption";
+import MultiselectDefer from "./components/multiselect-defer";
 
 // #endregion
 
@@ -102,6 +106,8 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const [isDefer, setisDefer] = useState(false);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [deferOptions, setDeferOptions] = useState<IDeferOptions[]>([]);
+  const [countries, setCountries] = useState<any[]>([]);
+  const [useCountrie, setUserCountrie] = useState<any>();
   //const [showMore, setShowMore] = useState(false);
   const [selectedCreditType, setSelectedCreditType] = useState<{
     code: string;
@@ -274,6 +280,23 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
     setShowMoreInfo(!showMoreInfo);
   }, [showMoreInfo]);
 
+  useEffect(() => {
+    const currCountrieCode: any = formData.buyer?.countryCode.value;
+    let isFetched = localStorage.getItem("fe_cou");
+    if (!showMoreInfo || !isFetched) {
+      const { getCountrie } = useFindCountrieByNumber(currCountrieCode);
+      getCountrie().then((response) => {
+        if (response?.data.length > 0) {
+          const countrieName = response?.data[0].attributes.name;
+          setUserCountrie(countrieName);
+          localStorage.setItem("fe_cou", "ok");
+        } else {
+          setUserCountrie("No encontrado");
+        }
+      });
+    }
+  }, [showMoreInfo]);
+
   const onRedirect = (url: string, data: any) => {
     setClearValue(true);
     const baseUrl = url;
@@ -384,7 +407,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 class="ppxiss-col ppxiss-col-6"
                 style={{ paddingRight: "5px" }}
               >
-                <ValidatedInput
+                {/* <ValidatedInput
                   type="buyer"
                   validator={validateExpiryDate}
                   errorMessage="requerido"
@@ -392,9 +415,23 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                   label="País"
                   name="contryCode"
                   placeholder="Ingrese su país"
-                  value={formData.buyer?.countryCode.value}
+                  value={useCountrie}
                   isValid={formData.buyer?.countryCode.isValid}
-                ></ValidatedInput>
+                ></ValidatedInput> */}
+                <MultiselectDefer
+                  validator={validateCountrieSelection}
+                  errorMessage="requerido"
+                  onChange={handleInputChange}
+                  label="País"
+                  name="contryCode"
+                  options={[
+                    {
+                      code: "ec",
+                      name: "Ecuador",
+                    },
+                  ]}
+                  initialValue={useCountrie}
+                />
               </div>
               <div
                 class="ppxiss-col ppxiss-col-6"

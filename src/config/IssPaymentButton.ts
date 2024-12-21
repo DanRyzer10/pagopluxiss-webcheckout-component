@@ -1,6 +1,7 @@
 import { ContainerNode, h, render } from 'preact';
 import { config } from './types/setup';
 import { PaymentButton } from '../app';
+import { ErrorHandler } from '../error';
 
 class IssPaymentButton {
     private config: config;
@@ -94,11 +95,23 @@ class IssPaymentButton {
         const errors: string[] = validateConfigProps(config)
         if (errors.length > 0) {
             console.error(`Config validation errors:\n${errors.join('\n')}`);
-            throw new Error('Error al renderizar el componente');
+            this.renderError();
+            
         } else {
             this.renderButton();
         }
     };
+    private renderError(){
+        if(this.container){
+            render(
+                h(ErrorHandler,{businessname: this.config.business.name, email: this.config.business.email, number:this.config.business.phonenumber}),
+                this.container
+            )
+    
+        }    else{
+            throw new Error('Container element not found');
+        }
+    }
     
     private renderButton() {
         if (this.container) {

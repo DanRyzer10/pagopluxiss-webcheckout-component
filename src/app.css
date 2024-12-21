@@ -128,6 +128,16 @@ body{
   margin-bottom: 10px;
   color:#1D3AA0 ;
 }
+.ppxiss-buttom-error-fallbck {
+  background-color: #1D3AA0;
+  color:white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
 .ppxiss-modal-container::backdrop {
   background-color: rgba(128, 128, 128, 0.5); /* Gris y transparente */
 }
@@ -454,3 +464,10 @@ display: flex;
 .ppxiss-col-10 { flex: 0 0 83.333333%; max-width: 83.333333%; }
 .ppxiss-col-11 { flex: 0 0 91.666667%; max-width: 91.666667%; }
 .ppxiss-col-12 { flex: 0 0 100%; max-width: 100%; }
+
+.ppxiss-error-title {
+  color: #1D3AA0;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 27.28px;
+}

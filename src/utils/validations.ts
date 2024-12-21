@@ -7,6 +7,9 @@ export function validateExpiryDate(expiryDate:string) {
     const regex = /^(0[1-9]|1[0-2])\/\d{2}$/;
     return regex.test(expiryDate);
   }
+  export function validateCountrieSelection(countrie:{code:string,name:string}){
+    return countrie.code !== '' && countrie.name !== '';
+  }
   
   export function validateCVV(cvv:string) {
     const regex = /^\d{3,4}$/;

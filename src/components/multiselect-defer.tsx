@@ -1,12 +1,18 @@
 import { MenuItem, InputLabel, FormControl, Select, Box } from "@mui/material";
-import { useCallback, useState } from "preact/hooks";
+import { useCallback, useState, useEffect } from "preact/hooks";
+import useGetCountries from "../api/use-get-countries";
+
 interface ValidatedDropdownProps {
-  validator?: (value: string) => boolean;
+  validator?: (value: { code: string; name: string }) => boolean;
   errorMessage?: string;
   onChange: (name: string, value: string, isValid: boolean) => void;
   name: string;
   label: string;
   options: any[];
+  value?: {
+    code: string;
+    name: string;
+  };
   initialValue?: string;
   onSendSelectedValue?: (value: {
     code: string;
@@ -14,31 +20,43 @@ interface ValidatedDropdownProps {
     name: string;
   }) => void;
 }
-export default function BasicSelect({
+
+export default function MultiselectDefer({
   validator,
   errorMessage,
   onChange,
+  value,
   name,
   label,
   options,
+  initialValue,
   onSendSelectedValue,
 }: ValidatedDropdownProps) {
-  const [creditType, setCreditType] = useState<{
-    code: string;
-    name: string;
-    instalments?: number[];
-  }>({
-    code: "",
-    name: "",
-  });
+  const [selectValue, setSelectValue] = useState<any>(
+    initialValue || value?.code || ""
+  );
+
+  useEffect(() => {
+    if (initialValue) {
+      setSelectValue(initialValue);
+    }
+  }, [initialValue]);
+
   const [error, setError] = useState("");
+  const fetchCountries = useCallback(async () => {
+    let pageCount = 1;
+    const { getCountries } = useGetCountries(pageCount);
+    const response = await getCountries();
+    pageCount++;
+    console.log("response", response);
+  }, []);
 
   const handleChange = useCallback(
     (event: any) => {
       if (!event.target) return "";
       const newValue = event.target.value;
       console.log("newValue", newValue);
-      setCreditType(newValue);
+      setSelectValue(newValue);
       const selectedValue: any = options.find(
         (option) => option.code === newValue
       );
@@ -54,7 +72,7 @@ export default function BasicSelect({
       setError(errorMsg as string);
       onChange(name, newValue, isValid);
     },
-    [validator, errorMessage, onChange, name]
+    [validator, errorMessage, onChange, name, options, onSendSelectedValue]
   );
 
   return (
@@ -63,14 +81,21 @@ export default function BasicSelect({
         <InputLabel id="ppxiss-multiselect-label">{label}</InputLabel>
         <Select
           labelId="ppxiss-multiselect-label"
+          displayEmpty
           id="demo-simple-select"
-          value={creditType}
+          value={selectValue}
           label={label}
+          renderValue={(value) => {
+            return value;
+          }}
+          onOpen={fetchCountries}
           onChange={handleChange}
         >
-          {options.map((option: any) => {
-            return <MenuItem value={option.code}>{option.name}</MenuItem>;
-          })}
+          {options.map((option: any) => (
+            <MenuItem key={option.code} value={option.code}>
+              {option.name}
+            </MenuItem>
+          ))}
         </Select>
         {error && <span className="ppxiss-error-message">{error}</span>}
       </FormControl>
