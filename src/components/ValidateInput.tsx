@@ -51,6 +51,7 @@ export const ValidatedInput = ({
         type="text"
         value={value}
         onInput={handleChange}
+        class={""}
         placeholder={placeholder}
         className={`ppxiss-input-component ${
           error ? "ppxiss-input-component-error" : "ppxiss-input-component-ok"

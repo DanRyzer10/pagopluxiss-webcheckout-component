@@ -4,7 +4,7 @@ import { StrapiCountrieResponse } from "./types/strapi-countries"
 const useGetCountries = (page:number) => {
   
     const getCountries = async (): Promise<StrapiCountrieResponse> => {
-      const queryParams = `pagination[page]=${page}&pagination[pageSize]=100&fields[0]=name&fields[1]=code&fields[2]=number`;
+      const queryParams = `pagination[page]=${page}&pagination[pageSize]=100`;
       const response = await fetch(`${strapiUrl}/countries?${queryParams}`, {
         method: 'GET',
         headers: {
@@ -12,7 +12,7 @@ const useGetCountries = (page:number) => {
           'Authorization': `Bearer ${strapiToken}`
         }
       });
-      return response.json();
+      return await response.json();
     };
   
     return { getCountries };

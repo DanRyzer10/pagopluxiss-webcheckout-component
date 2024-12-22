@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
-
 /* reset.css */
 
 /* Basic Reset */
@@ -138,6 +137,23 @@ body{
   font-size: 16px;
   cursor: pointer;
 }
+.ppxiss-card-brand-container-up{
+
+  display: flex;
+  justify-content: space-between;
+  background-color: #000000;
+  border-radius: 10px 10px 0 0;
+}
+.ppxiss-card-brand-background {
+  position: absolute;
+  top: -5%;
+  left: 0;
+  width: 90%;
+  height: 110%;
+  background-color: green;
+  z-index: -1; /* Asegura que la carta de fondo esté detrás */
+  border-radius: 8px; /* Ajusta según sea necesario */
+}
 .ppxiss-modal-container::backdrop {
   background-color: rgba(128, 128, 128, 0.5); /* Gris y transparente */
 }
@@ -267,6 +283,16 @@ display: flex;
   position: absolute;
   color: #DADADA;
 }
+.ppx-iss-input-label-medium {
+  z-index: 10;
+  bottom: 37px;
+  left: 15px;
+  background-color: white;
+  font-size: 11px;
+  font-weight: 500;
+  position: absolute;
+  color: #DADADA;
+}
 .ppx-iss-input-label-textarea{
   z-index: 10;
   bottom: 61px;
@@ -304,12 +330,17 @@ display: flex;
   padding: 18px 12px;
   margin-bottom: 20px;
   width: 270px;
-  height: 118px;
+  height: 130px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* display: flex;
+  flex-direction: column;
+  justify-content: space-between; */
   
 
+}
+.ppxiss-card-brand-content {
+  flex: 1; /* Permite que el contenido crezca y ocupe el espacio disponible */
 }
 .ppxiss-card-brand-container-card{
   display: flex;
@@ -328,21 +359,39 @@ display: flex;
 .ppxiss-input-component{
   position: relative;
   width: 100%;
-  height: 32px;
+  height: 35px;
+  padding: 7px 15px;
+  border-radius: 20px;
+}
+.ppxiss-input-component:hover{
+  border: 1px solid #10D7A6;
+}
+.ppxiss-select{
+  width: 100%;
+  height: 35px;
   padding: 7px 15px;
   border-radius: 20px;
   margin-bottom: 5px;
-}
-.ppxiss-input-component:hover{
-  border: 1px solid #000000;
+  border: 1px solid #DADADA;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg fill="%23000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+  padding-right: 30px; 
 }
 .ppxiss-input-component-error{
   border: 1px solid red;
  
 }
+.fixed-width-option {
+  width: 200px; /* Ajusta este valor según tus necesidades */
+  display: flex;
+  align-items: center;
+}
 .ppxiss-input-component-ok{
   border: 1px solid #DADADA;
-  margin-bottom: 16px;
+  margin-bottom: 13px;
 }
 
 .ppxiss-input-component::placeholder{
@@ -470,4 +519,53 @@ display: flex;
   font-weight: 700;
   font-size: 20px;
   line-height: 27.28px;
+}
+
+
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  border-radius: 20px;
+  max-width: auto;
+  font-family: Arial, sans-serif;
+}
+
+.dropdown-header {
+  padding: 10px;
+  border: .7px solid #DADADA;
+  border-radius: 20px;
+  width: 112px;
+  cursor: pointer;
+}
+
+.dropdown-header:hover {
+  background: #f0f0f0;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  max-height: 200px;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 1000;
+  scrollbar-width: thin;
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: #f0f0f0;
 }

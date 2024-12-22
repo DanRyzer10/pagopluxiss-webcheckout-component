@@ -1,5 +1,6 @@
 // #region IMPORTS
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
+import "bootstrap/dist/css/bootstrap.min.css";
 import SvgIcon from "./img/issLogo";
 import {
   validateCardNumber,
@@ -30,8 +31,9 @@ import { SplitInfoInput } from "./components/SplitInfoInput";
 import cityIdValidation from "./utils/cityIdValidation";
 
 import useFindCountrieByNumber from "./api/use-find-countrie-by-number";
-import BasicSelect from "./components/material/MultiselectOption";
-import MultiselectDefer from "./components/multiselect-defer";
+import ValidatedMultiselect from "./components/validated-multiselect";
+import ValidatedDefer from "./components/validated-defer-options";
+import ValidatedMultiselectCountry from "./components/multiselect-country";
 
 // #endregion
 
@@ -125,6 +127,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
     if (!selectedCreditType) return;
     let installments: any[] = selectedCreditType.installments;
     console.log(formData);
+    console.log("installments ", installments);
     if (installments.length > 0) {
       const installmentOptions: IDeferOptions[] =
         convertToDeferredOptions(installments);
@@ -283,11 +286,12 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   useEffect(() => {
     const currCountrieCode: any = formData.buyer?.countryCode.value;
     let isFetched = localStorage.getItem("fe_cou");
-    if (!showMoreInfo || !isFetched) {
+    if (!showMoreInfo && !isFetched) {
       const { getCountrie } = useFindCountrieByNumber(currCountrieCode);
       getCountrie().then((response) => {
         if (response?.data.length > 0) {
-          const countrieName = response?.data[0].attributes.name;
+          const countrieName = response?.data[0];
+          localStorage.setItem("c_cc", JSON.stringify(countrieName));
           setUserCountrie(countrieName);
           localStorage.setItem("fe_cou", "ok");
         } else {
@@ -310,26 +314,27 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   };
   //#region JSX
   return (
-    <div class="ppxiss-container">
+    <div className="container w-100">
       <OtpModal
         onResendOtp={resendOtp}
         open={isVisibleModal}
         onAction={onSendDataWithOtp}
         onOtpChange={handleOtp}
       ></OtpModal>
-      <div class="ppxiis-row">
-        <div class="ppxiss-col ppxiss-align-center ppxiss-card-brand-padding">
-          <span class="ppxis-text-align-center ppxiss-text-header-info">
+
+      <div class="row mb-1">
+        <div class="col text-align-center d-flex justify-content-center align-items-center text-center">
+          <span class=" ppxiss-text-header-info">
             Estás realizando un pago para
             <br />
-            <span class="ppxis-text-align-center ppxiss-text-header-info ppxiss-text-strong">
+            <span class=" ppxiss-text-header-info ppxiss-text-strong">
               {config.business.name}
             </span>
           </span>
         </div>
       </div>
-      <div class="ppxiss-row">
-        <div class="ppxiss-col ppxiss-align-center ppxiss-card-brand-padding">
+      <div class={"row mb-1"}>
+        <div class={"col d-flex text-align-center px-4 justify-content-center"}>
           <CardBrand
             cardNumber={formData?.card?.number?.value || ""}
             expiredDate={formData?.card?.expirationDate.value || ""}
@@ -337,23 +342,10 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           />
         </div>
       </div>
-      <div class="ppxiss-row">
-        <div class="ppxiss-col">
-          <SplitInfoInput
-            invalid={!validateBuyerInfo}
-            label="Propietario de la Tarjeta"
-            onChange={onShowMoreInfo}
-            value={{
-              ...config.buyer,
-              ...config.shipping_address,
-            }}
-          ></SplitInfoInput>
-        </div>
-      </div>
       {showMoreInfo ? (
-        <div className="ppxiss-moreinfo-container ppxiss-row ">
+        <div class={"ppxiss-moreinfo-container"}>
           <label className="float-label">Propietario de Tarjeta</label>
-          <div class="ppxiss-col">
+          <div class={"col px-2 pt-2 "}>
             <ValidatedInput
               type="buyer"
               validator={cityIdValidation}
@@ -361,204 +353,164 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
               onChange={handleInputChange}
               label="Cédula, RUC o Pasaporte"
               name="idNumber"
-              placeholder="Ingrese su numero de identificacion"
+              placeholder="Ingrese su numero de identificación"
               value={formData.buyer?.idNumber.value}
               isValid={formData.buyer?.idNumber.isValid}
             ></ValidatedInput>
-            <div class="ppxiss-row">
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingRight: "5px" }}
-              >
-                <ValidatedInput
-                  type="buyer"
-                  reset={clearValue}
-                  validator={validateOnlyLetters}
-                  errorMessage="Nombre inválido"
-                  onChange={handleInputChange}
-                  label="Nombre"
-                  name="name"
-                  placeholder="Nombre"
-                  value={formData.buyer?.name.value}
-                  isValid={formData.buyer?.name.isValid}
-                ></ValidatedInput>
-              </div>
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingLeft: "5px" }}
-              >
-                <ValidatedInput
-                  type="buyer"
-                  reset={clearValue}
-                  validator={validateOnlyLetters}
-                  errorMessage="Apellido inválido"
-                  onChange={handleInputChange}
-                  label="Apellido"
-                  name="lastName"
-                  placeholder="Nombre"
-                  value={formData.buyer?.lastName.value}
-                  isValid={formData.buyer?.lastName.isValid}
-                ></ValidatedInput>
-              </div>
+          </div>
+          <div class={"row px-2 "}>
+            <div class={"col "}>
+              <ValidatedInput
+                type="buyer"
+                reset={clearValue}
+                validator={validateOnlyLetters}
+                errorMessage="Nombre inválido"
+                onChange={handleInputChange}
+                label="Nombre"
+                name="name"
+                placeholder="Nombre"
+                value={formData.buyer?.name.value}
+                isValid={formData.buyer?.name.isValid}
+              ></ValidatedInput>
             </div>
-
-            <div class="ppxiss-row">
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingRight: "5px" }}
-              >
-                {/* <ValidatedInput
-                  type="buyer"
-                  validator={validateExpiryDate}
-                  errorMessage="requerido"
-                  onChange={handleInputChange}
-                  label="País"
-                  name="contryCode"
-                  placeholder="Ingrese su país"
-                  value={useCountrie}
-                  isValid={formData.buyer?.countryCode.isValid}
-                ></ValidatedInput> */}
-                <MultiselectDefer
-                  validator={validateCountrieSelection}
-                  errorMessage="requerido"
-                  onChange={handleInputChange}
-                  label="País"
-                  name="contryCode"
-                  options={[
-                    {
-                      code: "ec",
-                      name: "Ecuador",
-                    },
-                  ]}
-                  initialValue={useCountrie}
-                />
-              </div>
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingLeft: "5px" }}
-              >
-                <ValidatedInput
-                  type="buyer"
-                  reset={resendModal || clearValue}
-                  validator={validatePhoneNumber}
-                  errorMessage="Número invalido"
-                  onChange={handleInputChange}
-                  label="Celular"
-                  name="phone"
-                  value={formData.buyer?.phone.value}
-                  isValid={formData.buyer?.phone.isValid}
-                ></ValidatedInput>
-              </div>
+            <div class={"col"}>
+              <ValidatedInput
+                type="buyer"
+                reset={clearValue}
+                validator={validateOnlyLetters}
+                errorMessage="Apellido inválido"
+                onChange={handleInputChange}
+                label="Apellido"
+                name="lastName"
+                placeholder="Nombre"
+                value={formData.buyer?.lastName.value}
+                isValid={formData.buyer?.lastName.isValid}
+              ></ValidatedInput>
             </div>
+          </div>
 
-            <ValidatedInput
-              type="buyer"
-              reset={clearValue}
-              validator={validateEmail}
-              errorMessage="Correo inválido"
-              onChange={handleInputChange}
-              label="Correo"
-              name="email"
-              placeholder="Ingrese su correo electronico"
-              value={formData.buyer?.email.value}
-              isValid={formData.buyer?.email.isValid}
-            ></ValidatedInput>
-
-            <div class="ppxiss-row">
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingRight: "5px" }}
-              >
-                <ValidatedInput
-                  type="buyer"
-                  reset={clearValue}
-                  validator={validateOnlyLetters}
-                  errorMessage="Ciudad inválida"
-                  onChange={handleInputChange}
-                  label="Ciudad"
-                  name="clientCity"
-                  placeholder="Ingrese su ciudad"
-                  value={formData.buyer?.city.value}
-                  isValid={formData.buyer?.city.isValid}
-                ></ValidatedInput>
-              </div>
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingLeft: "5px" }}
-              >
-                <ValidatedInput
-                  type="buyer"
-                  reset={clearValue}
-                  validator={validateLettersWithPoints}
-                  errorMessage="Direccion invalida"
-                  onChange={handleInputChange}
-                  label="Dirección"
-                  name="clientAddress"
-                  placeholder="Ingrese su dirección"
-                  value={formData.buyer?.state.value}
-                  isValid={formData.buyer?.state.isValid}
-                ></ValidatedInput>
-              </div>
+          <div class={"row px-2 "}>
+            <div class={"col"}>
+              <ValidatedInput
+                type="buyer"
+                reset={clearValue}
+                validator={validateEmail}
+                errorMessage="Correo inválido"
+                onChange={handleInputChange}
+                label="Correo"
+                name="email"
+                placeholder="Ingrese su correo electronico"
+                value={formData.buyer?.email.value}
+                isValid={formData.buyer?.email.isValid}
+              ></ValidatedInput>
             </div>
+          </div>
 
-            <div class="ppxiss-row">
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingRight: "5px" }}
+          <div class={"row px-2 "}>
+            <div class={"col "}>
+              <ValidatedMultiselectCountry
+                validator={(value: string) => value.length > 0}
+                errorMessage="Seleccione un país"
+                onChange={handleInputChange}
+                label="País"
+                name="countryCode"
+                initialValue={useCountrie}
+              />
+            </div>
+            <div class={"col"}>
+              <ValidatedInput
+                type="buyer"
+                reset={clearValue}
+                validator={validateOnlyLetters}
+                errorMessage="Ciudad inválida"
+                onChange={handleInputChange}
+                label="Ciudad"
+                name="clientCity"
+                placeholder="Ingrese su ciudad"
+                value={formData.buyer?.city.value}
+                isValid={formData.buyer?.city.isValid}
+              ></ValidatedInput>
+            </div>
+          </div>
+
+          <div class={"row px-2 "}>
+            <div class={"col "}>
+              <ValidatedInput
+                type="buyer"
+                reset={clearValue}
+                validator={validateLettersWithPoints}
+                errorMessage="Direccion invalida"
+                onChange={handleInputChange}
+                label="Dirección"
+                name="clientAddress"
+                placeholder="Ingrese su dirección"
+                value={formData.buyer?.state.value}
+                isValid={formData.buyer?.state.isValid}
+              ></ValidatedInput>
+            </div>
+            <div class={"col"}>
+              <ValidatedInput
+                type="buyer"
+                reset={clearValue}
+                validator={validateZipCode}
+                errorMessage="Número de casa inválido"
+                onChange={handleInputChange}
+                label="Número"
+                name="clientZipCode"
+                placeholder="Ingrese su número de casa"
+                value={formData.buyer?.zipCode.value}
+                isValid={formData.buyer?.zipCode.isValid}
+              ></ValidatedInput>
+            </div>
+          </div>
+
+          <div class={"row"}>
+            <div class={"col d-flex justify-content-center"}>
+              <button
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#212121",
+                }}
+                onClick={onShowMoreInfo}
               >
-                <ValidatedInput
-                  type="buyer"
-                  reset={clearValue}
-                  validator={validateLettersWithPoints}
-                  errorMessage="Calle inválida"
-                  onChange={handleInputChange}
-                  label="Calle principal"
-                  name="clientStreet"
-                  placeholder="Ingrese su calle principal"
-                  value={formData.buyer?.street.value}
-                  isValid={formData.buyer?.street.isValid}
-                ></ValidatedInput>
-              </div>
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingLeft: "5px" }}
-              >
-                <ValidatedInput
-                  type="buyer"
-                  reset={clearValue}
-                  validator={validateZipCode}
-                  errorMessage="Codigo postal inválido"
-                  onChange={handleInputChange}
-                  label="Código Postal"
-                  name="clientZipCode"
-                  placeholder="Ingrese su codigo postal"
-                  value={formData.buyer?.zipCode.value}
-                  isValid={formData.buyer?.zipCode.isValid}
-                ></ValidatedInput>
-              </div>
+                <svg
+                  width="10"
+                  height="7"
+                  viewBox="0 0 10 7"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M5 2.49658L0.812103 7L1.04139e-08 6.12671L5 0.75L10 6.12671L9.1879 7L5 2.49658Z"
+                    fill="#212121"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
       ) : (
-        <form id="ppxiss-car-form" class="ppxiss-row" onSubmit={onSubmit}>
-          <div class="ppxiss-col">
-            <ValidatedInput
-              type="card"
-              reset={clearValue}
-              validator={validateCardNumber}
-              errorMessage="Número de tarjeta inválida"
-              onChange={handleInputChange}
-              label="Número de tarjeta"
-              name="number"
-              placeholder="XXXX XXXX XXXX XXXX"
-              value={formData.card.number.value}
-            ></ValidatedInput>
-
-            <div class="ppxiss-row">
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingRight: "5px" }}
-              >
+        <div>
+          <form id="ppxiss-card-form" class={""} onSubmit={onSubmit}>
+            <div class={"col"}>
+              <ValidatedInput
+                type="card"
+                reset={clearValue}
+                validator={validateCardNumber}
+                errorMessage="Número de tarjeta inválida"
+                onChange={handleInputChange}
+                label="Número de tarjeta"
+                name="number"
+                placeholder="XXXX XXXX XXXX XXXX"
+                value={formData.card.number.value}
+              ></ValidatedInput>
+            </div>
+            <div class={"row "}>
+              <div class={"col "}>
                 <ValidateDateInput
                   reset={clearValue}
                   validator={validateExpiryDate}
@@ -569,10 +521,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                   value={formData.card.expirationDate.value}
                 ></ValidateDateInput>
               </div>
-              <div
-                class="ppxiss-col ppxiss-col-6"
-                style={{ paddingLeft: "5px" }}
-              >
+              <div class={"col"}>
                 <ValidateCvvInput
                   reset={resendModal || clearValue}
                   validator={validateCVV}
@@ -584,41 +533,56 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 ></ValidateCvvInput>
               </div>
             </div>
-            <div class="ppxiss-row" style={{ marginBottom: "16px" }}>
-              <div class="ppxiss-col">
-                <BasicSelect
-                  label="Tipo de Crédito"
-                  name="creditType"
+
+            <div class={"row mb-1"}>
+              <div class={"col"}>
+                <ValidatedMultiselect
+                  validator={(value: string) => value.length > 0}
+                  errorMessage="Seleccione un país"
                   onChange={handleInputChange}
-                  validator={(value) => value !== ""}
-                  errorMessage="Seleccione una opción"
-                  options={config.installmentCredit as any}
                   onSendSelectedValue={handleSelectedCreditType}
-                ></BasicSelect>
+                  label="País"
+                  name="countryCode"
+                  options={config.installmentCredit || []}
+                  initialValue={""}
+                />
               </div>
             </div>
             {isDefer && (
-              <div class="ppxiss-row" style={{ marginBottom: "16px" }}>
-                <div class="ppxiss-col">
-                  <BasicSelect
-                    label="Diferido"
-                    name="deferPay"
+              <div class={"row mb-1"}>
+                <div class={"col"}>
+                  <ValidatedDefer
+                    validator={(value: string) => value.length > 0}
+                    errorMessage="Seleccione un plazo"
                     onChange={handleInputChange}
-                    validator={(value) => value !== ""}
-                    errorMessage="Seleccione una opción"
-                    options={deferOptions as any}
-                  ></BasicSelect>
+                    label="Plazo"
+                    name="deferPay"
+                    options={deferOptions}
+                    initialValue={""}
+                  />
                 </div>
               </div>
             )}
+          </form>
+          <div class={"row mb-1"}>
+            <div class={"col position-relative "}>
+              <SplitInfoInput
+                invalid={!validateBuyerInfo}
+                label="Propietario de la Tarjeta"
+                onChange={onShowMoreInfo}
+                value={{
+                  ...config.buyer,
+                  ...config.shipping_address,
+                }}
+              ></SplitInfoInput>
+            </div>
           </div>
-        </form>
+        </div>
       )}
-
-      <div class="ppxiss-row">
-        <div class="ppxiss-col ppxiss-align-center">
+      <div class={"row"}>
+        <div class={"col d-flex justify-content-center"}>
           <SubmitButton
-            form="ppxiss-car-form"
+            form="ppxiss-card-form"
             activeButton={() => (isFormValid() as boolean) && !isLoading}
             disabledButton={() => !isFormValid() || isLoading}
           >
@@ -630,8 +594,8 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           </SubmitButton>
         </div>
       </div>
-      <div class="ppxiss-row">
-        <div class="ppxiss-col ppxiss-align-center">
+      <div class={"row"}>
+        <div class={"col d-flex justify-content-center"}>
           <SvgIcon></SvgIcon>
         </div>
       </div>

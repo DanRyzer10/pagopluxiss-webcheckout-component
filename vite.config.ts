@@ -5,6 +5,9 @@ import cssInjector from 'vite-plugin-css-injected-by-js'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve:{
+  },
+
   plugins: [preact(),
     cssInjector({
       // exclude: /node_modules/,
