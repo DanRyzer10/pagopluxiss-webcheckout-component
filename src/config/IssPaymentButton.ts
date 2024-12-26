@@ -101,10 +101,10 @@ class IssPaymentButton {
             this.renderButton();
         }
     };
-    private renderError(){
+    private renderError(title:string="Ups! Algo ha salido mal.") {
         if(this.container){
             render(
-                h(ErrorHandler,{businessname: this.config.business.name, email: this.config.business.email, number:this.config.business.phonenumber}),
+                h(ErrorHandler,{businessname: this.config.business.name, email: this.config.business.email, number:this.config.business.phonenumber,title:title,fallback:()=>this.renderButton()}),
                 this.container
             )
     
@@ -116,7 +116,7 @@ class IssPaymentButton {
     private renderButton() {
         if (this.container) {
             render(
-                h(PaymentButton, { config: this.config, services: this.services }),
+                h(PaymentButton, { config: this.config, services: this.services,onError:this.renderError.bind(this) }),
                 this.container
             );
         } else {

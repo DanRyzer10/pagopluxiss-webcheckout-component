@@ -1,10 +1,20 @@
+/**
+ * @fileoverview
+ * @name app.tsx
+ * @description Este archivo contiene el componente principal de la aplicacion.
+ *  Este componente se encarga de renderizar el formulario de pago y de gestionar la logica de negocio
+ * para realizar el pago.
+ * @author Angel Zambrano
+ * @version 0.1.0 */
+/*
+ */
+
 // #region IMPORTS
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import "bootstrap/dist/css/bootstrap.min.css";
 import SvgIcon from "./img/issLogo";
 import {
   validateCardNumber,
-  validateCountrieSelection,
   validateCVV,
   validateEmail,
   validateExpiryDate,
@@ -34,11 +44,16 @@ import useFindCountrieByNumber from "./api/use-find-countrie-by-number";
 import ValidatedMultiselect from "./components/validated-multiselect";
 import ValidatedDefer from "./components/validated-defer-options";
 import ValidatedMultiselectCountry from "./components/multiselect-country";
+import ValidatedMultiSelectPhoneNumber from "./components/multi-select-phonenumber";
 
 // #endregion
 
 // #region COMPONENT APP
-export function PaymentButton({ config, services }: PaymentButtonProps) {
+export function PaymentButton({
+  config,
+  services,
+  onError,
+}: PaymentButtonProps) {
   // #region variables reactivas
   const [formData, setFormData] = useState<IFormData>({
     card: {
@@ -98,6 +113,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
       idType: { value: config.buyer.document_type, isValid: true },
     },
   });
+  //@ts-ignore
   const [payload, setPayload] = useState<payloadppx>();
   const [resendModal, setResendModal] = useState(false);
   const [isVisibleModal, setVisibleModal] = useState(false);
@@ -108,7 +124,6 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   const [isDefer, setisDefer] = useState(false);
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [deferOptions, setDeferOptions] = useState<IDeferOptions[]>([]);
-  const [countries, setCountries] = useState<any[]>([]);
   const [useCountrie, setUserCountrie] = useState<any>();
   //const [showMore, setShowMore] = useState(false);
   const [selectedCreditType, setSelectedCreditType] = useState<{
@@ -197,7 +212,6 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
     );
   };
   const validateBuyerInfo = useMemo(() => {
-    console.log(formData.buyer);
     return (
       formData.buyer &&
       Object.values(formData.buyer).every((field) => field.isValid)
@@ -207,11 +221,8 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
   // #region POSTDATA FORM
   const handleSubmit = async (e: any, action: "submit" | "otp") => {
     e.preventDefault();
-    console.log(formData);
     setIsLoading(true);
-    console.log(payload);
     if (isFormValid()) {
-      //const payload = await convertToPayload();
       const payload: any = await ConvertToPayload();
       if (action === "otp") {
         payload.paramsOtp = {
@@ -257,8 +268,13 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           //respuesta ok :)
           onRedirect(config.redirect_url, response.data);
         } else if (response?.code === 3) {
+          onError();
           console.error("Credenciales de establecimiento no encontradas");
+        } else if (response?.code === 102) {
+          onError("Transacción no logró ser procesada.");
         } else {
+          //
+          onError();
           console.error(
             `No se pudo realizar la transaccion. Comunicate con el establecmiento:\n mail :${config.business.email}\n telefono:${config.business.phonenumber}`
           );
@@ -407,6 +423,36 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
           </div>
 
           <div class={"row px-2 "}>
+            <div class={"col-4 pe-0"}>
+              <ValidatedMultiSelectPhoneNumber
+                validator={(value: any) =>
+                  value.code !== "" && value.name !== ""
+                }
+                errorMessage="código inválido"
+                onChange={handleInputChange}
+                label="Teléfono"
+                name="phone"
+                initialValue={useCountrie}
+              />
+            </div>
+            <div class={"col-8 ps-0"}>
+              <ValidatedInput
+                type="buyer"
+                style={{ borderRadius: "0px 20px 20px 0", height: "37px" }}
+                reset={clearValue}
+                validator={validatePhoneNumber}
+                errorMessage="Número de teléfono inválido"
+                onChange={handleInputChange}
+                label="Número"
+                name="phone"
+                placeholder="Ingrese su número de teléfono"
+                value={formData.buyer?.phone.value}
+                isValid={formData.buyer?.phone.isValid}
+              />
+            </div>
+          </div>
+
+          <div class={"row px-2 "}>
             <div class={"col "}>
               <ValidatedMultiselectCountry
                 validator={(value: string) => value.length > 0}
@@ -505,7 +551,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                 onChange={handleInputChange}
                 label="Número de tarjeta"
                 name="number"
-                placeholder="XXXX XXXX XXXX XXXX"
+                placeholder="Ingrese su número de tarjeta"
                 value={formData.card.number.value}
               ></ValidatedInput>
             </div>
@@ -542,7 +588,7 @@ export function PaymentButton({ config, services }: PaymentButtonProps) {
                   onChange={handleInputChange}
                   onSendSelectedValue={handleSelectedCreditType}
                   label="País"
-                  name="countryCode"
+                  name="creditType"
                   options={config.installmentCredit || []}
                   initialValue={""}
                 />

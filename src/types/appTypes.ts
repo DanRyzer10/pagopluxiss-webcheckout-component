@@ -4,6 +4,7 @@ export interface PaymentButtonProps {
     services: {
       service_bridge: string;
     };
+    onError: Function;
   }
   // #endregion
   export interface creditTypeValue {

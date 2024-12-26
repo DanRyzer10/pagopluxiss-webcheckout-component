@@ -4,18 +4,24 @@ interface ErrorHandlerProps {
   businessname: string;
   email: string;
   number: string;
+  title?: string;
+  fallback: Function;
+  description?: string;
+  isException?: boolean;
 }
 
 export function ErrorHandler({
   businessname,
   email,
+  fallback,
+  title,
   number,
 }: ErrorHandlerProps) {
   return (
     <div style={{ textAlign: "left", padding: 10 }}>
       <ErrorIcon />
       <h1 style={{ marginBottom: 14 }} class="ppxiss-error-title">
-        Ups! Algo ha salido mal.
+        {title}
       </h1>
       <p>
         Su solicitud no pudo ser procesada, por favor comuníquese con{" "}
@@ -26,7 +32,9 @@ export function ErrorHandler({
         <li style={{ fontWeight: 500 }}>{email}</li>
         <li style={{ fontWeight: 500 }}>{number}</li>
       </ul>
-      <button class="ppxiss-buttom-error-fallbck">Salir</button>
+      <button onClick={() => fallback()} class="ppxiss-buttom-error-fallbck">
+        Reintentar
+      </button>
     </div>
   );
 }

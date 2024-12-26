@@ -1,5 +1,23 @@
+import { CSSProperties } from "preact/compat";
 import { useState, useCallback, useEffect } from "preact/hooks";
-
+interface ValidatedInputProps {
+  validator: (value: string) => boolean;
+  errorMessage?: string;
+  onChange: (
+    name: any,
+    value: any,
+    isValid: any,
+    target?: "card" | "buyer"
+  ) => void;
+  name: string;
+  label: string;
+  reset?: boolean;
+  placeholder?: string;
+  type?: string;
+  value?: string;
+  isValid?: boolean;
+  style?: CSSProperties; // Añadido para aceptar un objeto de estilo opcional
+}
 export const ValidatedInput = ({
   validator,
   errorMessage,
@@ -8,10 +26,11 @@ export const ValidatedInput = ({
   label,
   reset,
   placeholder,
+  style,
   type,
   value: initialValue = "",
   isValid: initialIsValid = true,
-}: any) => {
+}: ValidatedInputProps) => {
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState(initialIsValid ? "" : errorMessage);
 
@@ -24,11 +43,11 @@ export const ValidatedInput = ({
       let errorMsg = "";
       if (validator) {
         isValid = validator(newValue);
-        errorMsg = isValid ? "" : errorMessage;
+        errorMsg = isValid ? "" : (errorMessage as string);
       }
       setError(errorMsg);
 
-      onChange(name, newValue, isValid, type || "card");
+      onChange(name, newValue, isValid, (type as "card" | "buyer") || "card");
     },
     [validator, errorMessage, onChange, name]
   );
@@ -48,6 +67,7 @@ export const ValidatedInput = ({
         </label>
       )}
       <input
+        style={style}
         type="text"
         value={value}
         onInput={handleChange}

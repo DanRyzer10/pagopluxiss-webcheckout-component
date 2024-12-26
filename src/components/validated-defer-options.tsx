@@ -15,6 +15,7 @@ interface ValidatedDeferOptions {
   }) => void;
 }
 const ValidatedDefer = ({ ...props }: ValidatedDeferOptions) => {
+  //@ts-ignore
   const [creditType, setCreditType] = useState<{
     code: string;
     name: string;
@@ -23,6 +24,7 @@ const ValidatedDefer = ({ ...props }: ValidatedDeferOptions) => {
     code: "",
     name: "",
   });
+  //@ts-ignore
   const [error, setError] = useState("");
 
   const handleChange = useCallback(

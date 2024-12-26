@@ -32,6 +32,22 @@ footer, header, hgroup, menu, nav, section {
 body {
   line-height: 1;
 }
+#iss-payment-button{
+  background-color: #FEFEFE;
+  border: none;
+  padding: 10px 5px;
+font-size: 16px;
+cursor: pointer;
+  border-radius: 5px;
+margin-top: 20px;
+border: 1.5px solid;
+border-radius: 25px;
+width: 300px;
+border-image: linear-gradient(180deg, rgba(29, 58, 160, 0.1) 0%, #0085FF 50.5%, rgba(29, 58, 160, 0.1) 100%) 1;
+box-shadow: 4px 4px 10px 0px #0000000D;
+
+
+}
 
 ol, ul {
   list-style: none;
@@ -156,21 +172,6 @@ body{
 }
 .ppxiss-modal-container::backdrop {
   background-color: rgba(128, 128, 128, 0.5); /* Gris y transparente */
-}
-#iss-payment-button{
-  background-color: #FEFEFE;
-  border: none;
-  width: 300px;
-  padding: 10px 5px;
-font-size: 16px;
-cursor: pointer;
-  border-radius: 5px;
-margin-top: 20px;
-border: 1.5px solid;
-border-radius: 20px;
-width: 300px;
-display: flex;
-
 }
 .ppxiss-text-header-info{
   font-size: 12px;
@@ -527,19 +528,31 @@ display: flex;
   display: inline-block;
   border-radius: 20px;
   max-width: auto;
-  font-family: Arial, sans-serif;
+}
+.custom-dropdown:hover{
+  border: #10D7A6 1px solid;
+}
+.custom-dropdown-alter:hover{
+  border: #10D7A6 1px solid;
+}
+.custom-dropdown-alter{
+  position: relative;
+  display: inline-block;
+  border-radius: 20px 0 0 20px;
+  max-width: auto
 }
 
 .dropdown-header {
   padding: 10px;
-  border: .7px solid #DADADA;
   border-radius: 20px;
   width: 112px;
   cursor: pointer;
 }
-
-.dropdown-header:hover {
-  background: #f0f0f0;
+.dropdown-header-alter{
+  padding: 10px;
+  border-radius: 20px 0 0 20px;
+  width: 112px;
+  cursor: pointer;
 }
 
 .dropdown-list {

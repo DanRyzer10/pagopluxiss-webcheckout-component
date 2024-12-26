@@ -15,6 +15,7 @@ interface ValidatedSelectProps {
   }) => void;
 }
 const ValidatedMultiselect = ({ ...props }: ValidatedSelectProps) => {
+  //@ts-ignore
   const [creditType, setCreditType] = useState<{
     code: string;
     name: string;
