@@ -13,7 +13,7 @@ class IssPaymentButton {
 
     constructor(setup: config) {
         this.config = setup;
-        this.container = document.getElementById('iss-payment-button');
+        this.container = document.getElementById('dataweb');
         this.services = {
             service_key: '/api/webcheckout/send-payform',
             service_bridge: '/api/webcheckout/sendPayform'
