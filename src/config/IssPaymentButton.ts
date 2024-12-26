@@ -18,11 +18,30 @@ class IssPaymentButton {
             service_key: '/api/webcheckout/send-payform',
             service_bridge: '/api/webcheckout/sendPayform'
         }
+        this.config = this.convertDataTypes(this.config);
         this.initialize(this.config);
     }
 
+    private convertDataTypes(config: any){
+        if (config.business) {
+            config.business.phonenumber = config.business.phonenumber.toString();
+        }
+        if (config.total_amount) {
+            config.total_amount = parseFloat(config.total_amount);
+        }
+        if (config.buyer) {
+            config.buyer.countrycode = config.buyer.countrycode.toString();
+            config.buyer.phonenumber = config.buyer.phonenumber.toString();
+        }
+        return config;
+    };
     private initialize(config: any) {
+
+        
+
+
         const validateConfigProps = (config: config): string[] => {
+           
             const errors: string[] = [];
             const schema: { [key: string]: string | object | string[] } = {
                 setting: {
