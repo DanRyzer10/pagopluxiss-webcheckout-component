@@ -42,17 +42,17 @@
       email:'angeldanile@mail.com',
       country:'EC',
       country_code:'593',
-      phonenumber:'0991899474',
+      phonenumber:991899474, //convertir a string
     },
     reference_id: 'testReferenceId',
     module: 'COLLECTION',
     currency: 'USD',
-    total_amount: 100.00,
+    total_amount: "100.00", //convertir a number
     items: [
         {
             name:'lavadora',
-            quantity:5,
-            price:89.98,
+            quantity:5, 
+            price:89.98, 
             discount:7.83,
             amount:78.43
         }
@@ -74,13 +74,13 @@
        identity:'0959157264',
        names:'pepito',
        lastnames:'Parra',
-       countrycode:'593',
-       phonenumber:'0991899474',
+       countrycode:593, //convertir a string
+       phonenumber:991899474, //convertir a string
        email:'angeldaniel@gmail.com',
        ipaddress:'172.178.2.1',
     },
     shipping_address: {
-        country:'EC', //parametro delicado, se le envia codigo ISO 2
+        country:'EC',
         state:'Pichincha',
         city:'Quito',
         Zipcode:'123',
