@@ -83,16 +83,20 @@ export function PaymentButton({
         isValid: validatePhoneNumber(config.buyer.phonenumber),
       },
       address: {
-        value: config.shipping_address.state,
-        isValid: validateLettersWithPoints(config.shipping_address.state),
+        value: config.shipping_address.street as string,
+        isValid: validateLettersWithPoints(
+          config.shipping_address.street as string
+        ),
       },
       city: {
         value: config.shipping_address.city,
         isValid: validateLettersWithPoints(config.shipping_address.city),
       },
       state: {
-        value: config.shipping_address.state,
-        isValid: validateLettersWithPoints(config.shipping_address.state),
+        value: config.shipping_address.street as string,
+        isValid: validateLettersWithPoints(
+          config.shipping_address.street as string
+        ),
       },
       countryCode: {
         value: config.buyer.countrycode,
@@ -103,8 +107,8 @@ export function PaymentButton({
         isValid: validateLettersWithPoints(config.shipping_address.street),
       },
       zipCode: {
-        value: config.shipping_address.Zipcode,
-        isValid: validateZipCode(config.shipping_address.Zipcode),
+        value: config.shipping_address.number as string,
+        isValid: validateZipCode(config.shipping_address.number as string),
       },
       idNumber: {
         value: config.buyer.identity,
@@ -189,6 +193,7 @@ export function PaymentButton({
     (
       name: any,
       value: any,
+      //@ts-ignore
       isValid: any,
       target: "card" | "buyer" = "card"
     ) => {
@@ -197,7 +202,7 @@ export function PaymentButton({
         ...prevData,
         [target]: {
           ...prevData[target as any],
-          [name]: { value, isValid },
+          [name]: { value, isValid: isValid },
         },
       }));
     },

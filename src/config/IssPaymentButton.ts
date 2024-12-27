@@ -13,7 +13,7 @@ class IssPaymentButton {
 
     constructor(setup: config) {
         this.config = setup;
-        this.container = document.getElementById('iss-payment-button');
+        this.container = document.getElementById('dataweb');
         this.services = {
             service_key: '/api/webcheckout/send-payform',
             service_bridge: '/api/webcheckout/sendPayform'
@@ -36,8 +36,8 @@ class IssPaymentButton {
                     name: 'string',
                     email: 'string',
                     country: 'string',
-                    country_code: 'string',
-                    phonenumber: 'string',
+                    country_code: 'number',
+                    phonenumber: 'number',
                 },
                 reference_id: 'string',
                 module: 'string',
@@ -48,16 +48,15 @@ class IssPaymentButton {
                     names: 'string',
                     lastnames: 'string',
                     email: 'string',
-                    countrycode: 'string',
-                    phonenumber: 'string',
+                    countrycode: 'number',
+                    phonenumber: 'number',
                     ipaddress: 'string',
                 },
                 shipping_address: {
                     country: 'string',
-                    state: 'string',
                     city: 'string',
-                    Zipcode: 'string',
                     street: 'string',
+                    number:'string'
                 },
                 redirect_url: 'string',
             }
@@ -65,7 +64,7 @@ class IssPaymentButton {
                 errors.push(`Propiedad de modulo inválida: ${config.module} no pertenece a COLLECTION,SUBSCRIPTION,TOKENIZATION`)
             }
             if (config.module === 'COLLECTION' || config.module === 'SUBSCRIPTION') {
-                schema['total_amount'] = 'number',
+                schema['total_amount'] = 'string',
                 schema['installmentCredit'] = 'object'
             }
             const validateObject = (obj: any, schema: any, path: string = ''): void => {

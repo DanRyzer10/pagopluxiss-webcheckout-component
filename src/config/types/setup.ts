@@ -34,9 +34,10 @@ export interface config {
     },
     shipping_address:{
         country:string,
-        state:string,
+        state?:string,
         city:string,
-        Zipcode:string,
+        number:string
+        Zipcode?:string,
         street:string,
     },
     redirect_url:string,

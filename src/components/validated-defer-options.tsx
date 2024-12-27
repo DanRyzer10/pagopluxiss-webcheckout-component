@@ -28,8 +28,12 @@ const ValidatedDefer = ({ ...props }: ValidatedDeferOptions) => {
   const [error, setError] = useState("");
 
   const handleChange = useCallback(
-    (event: any) => {
-      console.log("event", event);
+    (event: Event) => {
+      const target = event.target as HTMLSelectElement;
+      const value = target.value;
+      const isValid = true;
+      setError(isValid ? "" : props.errorMessage || "Invalid value");
+      props.onChange(props.name, value, isValid);
     },
     [props.validator, props.errorMessage, props.onChange, props.name]
   );

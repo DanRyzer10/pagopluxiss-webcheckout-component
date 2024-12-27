@@ -19,9 +19,9 @@ interface SplitInfoInputProps {
     phonenumber: string;
     ipaddress: string;
     country: string;
-    state: string;
+    state?: string;
     city: string;
-    Zipcode: string;
+    Zipcode?: string;
     street: string;
   };
 }

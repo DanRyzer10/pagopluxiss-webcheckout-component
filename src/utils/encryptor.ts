@@ -7,7 +7,7 @@ export default class Encryptor{
     private readonly key:string;
 
     constructor(key:string){
-        this.key = key;
+        this.key = Base64.parse(key).toString();
     }
 
     encrypt(plainText:string):string{
