@@ -26,5 +26,6 @@ export default defineConfig({
       }
     },
     cssCodeSplit:false
-  }
+  },
+  envDir: './',
 })

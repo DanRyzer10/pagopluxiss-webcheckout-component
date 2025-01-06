@@ -18,10 +18,10 @@ class IssPaymentButton {
             service_key: '/api/webcheckout/send-payform',
             service_bridge: '/api/webcheckout/sendPayform'
         }
-        this.config = this.convertDataTypes(this.config);
+        // this.config = this.convertDataTypes(this.config);
         this.initialize(this.config);
     }
-
+    //@ts-ignore
     private convertDataTypes(config: any){
         if (config.business) {
             config.business.phonenumber = config.business.phonenumber.toString();

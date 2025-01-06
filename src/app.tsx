@@ -230,8 +230,10 @@ export function PaymentButton({
     if (isFormValid()) {
       const payload: any = await ConvertToPayload();
       if (action === "otp") {
+        console.log("payload response: ", responseppx);
         payload.paramsOtp = {
-          ...responseppx?.data.detail,
+          //@ts-ignore
+          ...responseppx?.detail,
           otpCode: otp,
         };
       }
@@ -242,15 +244,22 @@ export function PaymentButton({
           config.setting.simetricKey
         );
         response = await apiService.post(services.service_bridge, payload);
+        sessionStorage.setItem("rsp_ppxiss", JSON.stringify(response));
         setResponse(response);
 
         /**
          * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
          */
         if (response?.code == 103) {
+          console.log("redireccion 3ds");
+          console.log(response);
+          //@ts-ignore
+          console.log(response.detail);
           //validator 3ds
-          const challengeUrl: any = response.data?.detail?.url;
-          const params: any = response.data.detail.parameters;
+          //@ts-ignore
+          const challengeUrl: any = response.detail?.url;
+          //@ts-ignore
+          const params: any = response.detail.parameters;
           const queryParams = params
             .map(
               (param: any) =>
@@ -259,8 +268,9 @@ export function PaymentButton({
                 )}`
             )
             .join("&");
-
+          console.log("queryParams", queryParams);
           const fullUrl: string = `${challengeUrl}&${queryParams}`;
+          console.log("fullUrl", fullUrl);
           const redirectUrl: string = import.meta.env
             .VITE_CHALLENGE_URL as string;
           window.location.href = `${redirectUrl}?challengeUrl=${encodeURIComponent(
@@ -271,7 +281,7 @@ export function PaymentButton({
           setVisibleModal(true);
         } else if (response?.code === 0) {
           //respuesta ok :)
-          onRedirect(config.redirect_url, response.data);
+          onRedirect(config.redirect_url, response);
         } else if (response?.code === 3) {
           onError();
           console.error("Credenciales de establecimiento no encontradas");
@@ -323,6 +333,7 @@ export function PaymentButton({
   }, [showMoreInfo]);
 
   const onRedirect = (url: string, data: any) => {
+    console.log("data de redireccion: ", data);
     setClearValue(true);
     const baseUrl = url;
     const queryParams = new URLSearchParams(data).toString();
