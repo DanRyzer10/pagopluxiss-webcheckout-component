@@ -16,7 +16,6 @@ export class ApiService {
     //     try{
     //         const response = await fetch(`${this.baseUrl}${endpoint}`,{
     //             method:'POST',
-    //             mode:'no-cors',
     //             headers:{
     //                 'Content-Type':'application/json',
     //                 'Authorization':`Basic ${this.authorization}`,
@@ -29,7 +28,7 @@ export class ApiService {
     //         }
     //         const data = await response.json();
     //         return {
-    //             data,
+    //             data:data,
     //             status:response.status,
     //             code:data.code
     //         }

@@ -4,11 +4,13 @@ interface CardBrandProps {
   cardNumber: string;
   expiredDate: string;
   names: string;
+  lastnames: string;
 }
 export const CardBrand = ({
   cardNumber,
   expiredDate,
   names,
+  lastnames,
 }: CardBrandProps) => {
   const [cardLayer, setCardLayer] = useState<string>("XXXX XXXX XXXX XXXX");
   const [expiredDateLayer, setExpiredDateLayer] = useState<string>("MM/YY");
@@ -60,7 +62,9 @@ export const CardBrand = ({
             "col d-flex justify-content-start ppxiss-card-brand-font-medium"
           }
         >
-          {names}
+          {names.length + lastnames.length + 1 > 12
+            ? names.slice(0, 1) + ". " + lastnames.slice(0, 11 - names.length)
+            : names + " " + lastnames}
         </div>
         <div
           class={"col d-flex justify-content-end ppxiss-card-brand-font-small"}

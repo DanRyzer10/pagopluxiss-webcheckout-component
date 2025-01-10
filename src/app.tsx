@@ -61,8 +61,8 @@ export function PaymentButton({
       expirationDate: { value: "", isValid: false },
       cvv: { value: "", isValid: false },
       creditType: {
-        value: "",
-        isValid: false,
+        value: config.installmentCredit ? config.installmentCredit[0].code : "",
+        isValid: true,
       },
     },
     buyer: {
@@ -120,7 +120,7 @@ export function PaymentButton({
   //@ts-ignore
   const [payload, setPayload] = useState<payloadppx>();
   const [resendModal, setResendModal] = useState(false);
-  const [isVisibleModal, setVisibleModal] = useState(false);
+  const [isVisibleModal, setVisibleModal] = useState(true);
   const [responseppx, setResponse] = useState<responseppx>();
   const [isLoading, setIsLoading] = useState(false);
   const [clearValue, setClearValue] = useState(false);
@@ -134,7 +134,11 @@ export function PaymentButton({
     code: string;
     installments: number[];
     name: string;
-  }>();
+  }>(
+    config.installmentCredit
+      ? config.installmentCredit[0]
+      : { code: "", installments: [], name: "" }
+  );
   const handleSelectedCreditType = (value: {
     code: string;
     installments: number[];
@@ -155,10 +159,11 @@ export function PaymentButton({
       setFormData((prevData) => ({
         card: {
           ...prevData.card,
-          deferPay: { value: "", isValid: false },
+          deferPay: { value: installments[0], isValid: true },
         },
         buyer: prevData.buyer,
       }));
+      console.log(formData);
     } else {
       setisDefer(false);
       const { deferPay, ...rest } = formData.card;
@@ -197,6 +202,7 @@ export function PaymentButton({
       isValid: any,
       target: "card" | "buyer" = "card"
     ) => {
+      console.log(formData);
       //@ts-ignore
       setFormData((prevData: any) => ({
         ...prevData,
@@ -251,6 +257,7 @@ export function PaymentButton({
          * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
          */
         if (response?.code == 103) {
+          sessionStorage.setItem("ppxiss-auth", config.setting.authorization);
           console.log("redireccion 3ds");
           console.log(response);
           //@ts-ignore
@@ -333,10 +340,19 @@ export function PaymentButton({
   }, [showMoreInfo]);
 
   const onRedirect = (url: string, data: any) => {
-    console.log("data de redireccion: ", data);
     setClearValue(true);
     const baseUrl = url;
-    const queryParams = new URLSearchParams(data).toString();
+    const transactionId = data.detail.id_transaccion;
+    const tokenCard = data.detail.token;
+    const params = {
+      transaction_id: transactionId,
+      token: tokenCard,
+      credit_code: selectedCreditType.code,
+      installment: formData.card.deferPay?.value ?? 0,
+    };
+    const queryParams = new URLSearchParams(
+      params as Record<string, string>
+    ).toString();
     const fullUrl = `${baseUrl}?${queryParams}`;
     window.location.href = fullUrl;
   };
@@ -371,6 +387,7 @@ export function PaymentButton({
             cardNumber={formData?.card?.number?.value || ""}
             expiredDate={formData?.card?.expirationDate.value || ""}
             names={config.buyer?.names}
+            lastnames={config.buyer.lastnames}
           />
         </div>
       </div>
