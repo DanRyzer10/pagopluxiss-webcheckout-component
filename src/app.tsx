@@ -45,6 +45,8 @@ import ValidatedMultiselect from "./components/validated-multiselect";
 import ValidatedDefer from "./components/validated-defer-options";
 import ValidatedMultiselectCountry from "./components/multiselect-country";
 import ValidatedMultiSelectPhoneNumber from "./components/multi-select-phonenumber";
+import { PaymentHandler } from "./modules/payment-handler";
+import { resourceLimits } from "worker_threads";
 
 // #endregion
 
@@ -243,66 +245,79 @@ export function PaymentButton({
           otpCode: otp,
         };
       }
-      let response: responseppx | undefined;
+      // let response: responseppx | undefined;
       try {
-        const apiService = new ApiService(
-          config.setting.authorization,
-          config.setting.simetricKey
+        // const apiService = new ApiService(
+        //   config.setting.authorization,
+        //   config.setting.simetricKey
+        // );
+        // response = await apiService.post(services.service_bridge, payload);
+        // setResponse(response);
+
+        const paymentHandler = new PaymentHandler(config);
+        const response = await paymentHandler.initializePayment(
+          services.service_bridge,
+          payload
         );
-        response = await apiService.post(services.service_bridge, payload);
-        sessionStorage.setItem("rsp_ppxiss", JSON.stringify(response));
-        setResponse(response);
+        console.log(response);
+        if (response.status == "SUCCESS") {
+          onRedirect(config.redirect_url, response.response);
+        } else if (response.status == "PENDING_OTP") {
+          setVisibleModal(true);
+          setResponse(response.response);
+        }
 
         /**
          * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
          */
-        if (response?.code == 103) {
-          sessionStorage.setItem("ppxiss-auth", config.setting.authorization);
-          console.log("redireccion 3ds");
-          console.log(response);
-          //@ts-ignore
-          console.log(response.detail);
-          //validator 3ds
-          //@ts-ignore
-          const challengeUrl: any = response.detail?.url;
-          //@ts-ignore
-          const params: any = response.detail.parameters;
-          const queryParams = params
-            .map(
-              (param: any) =>
-                `${encodeURIComponent(param.name)}=${encodeURIComponent(
-                  param.value
-                )}`
-            )
-            .join("&");
-          console.log("queryParams", queryParams);
-          const fullUrl: string = `${challengeUrl}&${queryParams}`;
-          console.log("fullUrl", fullUrl);
-          const redirectUrl: string = import.meta.env
-            .VITE_CHALLENGE_URL as string;
-          window.location.href = `${redirectUrl}?challengeUrl=${encodeURIComponent(
-            fullUrl
-          )}`;
-        } else if (response?.code === 100) {
-          //otp validacion
-          setVisibleModal(true);
-        } else if (response?.code === 0) {
-          //respuesta ok :)
-          onRedirect(config.redirect_url, response);
-        } else if (response?.code === 3) {
-          onError();
-          console.error("Credenciales de establecimiento no encontradas");
-        } else if (response?.code === 102) {
-          onError("Transacción no logró ser procesada.");
-        } else {
-          //
-          onError();
-          console.error(
-            `No se pudo realizar la transaccion. Comunicate con el establecmiento:\n mail :${config.business.email}\n telefono:${config.business.phonenumber}`
-          );
-        }
+        // if (response?.code == 103) {
+        //   sessionStorage.setItem("ppxiss-auth", config.setting.authorization);
+        //   console.log("redireccion 3ds");
+        //   console.log(response);
+        //   //@ts-ignore
+        //   console.log(response.detail);
+        //   //validator 3ds
+        //   //@ts-ignore
+        //   const challengeUrl: any = response.detail?.url;
+        //   //@ts-ignore
+        //   const params: any = response.detail.parameters;
+        //   const queryParams = params
+        //     .map(
+        //       (param: any) =>
+        //         `${encodeURIComponent(param.name)}=${encodeURIComponent(
+        //           param.value
+        //         )}`
+        //     )
+        //     .join("&");
+        //   console.log("queryParams", queryParams);
+        //   const fullUrl: string = `${challengeUrl}&${queryParams}`;
+        //   console.log("fullUrl", fullUrl);
+        //   const redirectUrl: string = import.meta.env
+        //     .VITE_CHALLENGE_URL as string;
+        //   window.location.href = `${redirectUrl}?challengeUrl=${encodeURIComponent(
+        //     fullUrl
+        //   )}`;
+        // } else if (response?.code === 100) {
+        //   //otp validacion
+        //   setVisibleModal(true);
+        // } else if (response?.code === 0) {
+        //   //respuesta ok :)
+        //   onRedirect(config.redirect_url, response);
+        // } else if (response?.code === 3) {
+        //   onError();
+        //   console.error("Credenciales de establecimiento no encontradas");
+        // } else if (response?.code === 102) {
+        //   onError("");
+        // } else {
+        //   //
+        //   onError();
+        //   console.error(
+        //     `No se pudo realizar la transaccion. Comunicate con el establecmiento:\n mail :${config.business.email}\n telefono:${config.business.phonenumber}`
+        //   );
+        // }
       } catch (e) {
         console.error(e);
+        onError("Error al procesar el pago");
       } finally {
         setIsLoading(false);
         if (action === "otp") {

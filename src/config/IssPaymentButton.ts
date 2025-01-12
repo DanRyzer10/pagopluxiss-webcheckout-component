@@ -8,7 +8,8 @@ class IssPaymentButton {
     private container: ContainerNode | null;
     private readonly services: {
         service_key: string,
-        service_bridge: string
+        service_bridge: string,
+
     }
 
     constructor(setup: config) {
@@ -16,7 +17,7 @@ class IssPaymentButton {
         this.container = document.getElementById('dataweb');
         this.services = {
             service_key: '/api/webcheckout/send-payform',
-            service_bridge: '/api/webcheckout/sendPayform'
+            service_bridge: '/api/webcheckout/sendPayform',
         }
         // this.config = this.convertDataTypes(this.config);
         this.initialize(this.config);
