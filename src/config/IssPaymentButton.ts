@@ -36,10 +36,6 @@ class IssPaymentButton {
         return config;
     };
     private initialize(config: any) {
-
-        
-
-
         const validateConfigProps = (config: config): string[] => {
            
             const errors: string[] = [];
@@ -97,9 +93,9 @@ class IssPaymentButton {
                         }
                     } else {
                         if (!obj.hasOwnProperty(key)) {
-                            errors.push(`Missing property: ${fullPath}`);
+                            errors.push(`Propiedad requerida: ${fullPath}`);
                         } else if (typeof obj[key] !== schema[key]) {
-                            errors.push(`Invalid type for property: ${fullPath}. Expected ${schema[key]}, but got ${typeof obj[key]}`);
+                            errors.push(`Tipo inválido de propiedad: ${fullPath}. Expected ${schema[key]}, but got ${typeof obj[key]}`);
                         }
                     }
                 }
@@ -113,11 +109,11 @@ class IssPaymentButton {
         const errors: string[] = validateConfigProps(config)
         if (errors.length > 0) {
             console.error(`Config validation errors:\n${errors.join('\n')}`);
-            this.renderError();
             
-        } else {
-            this.renderButton();
-        }
+            // this.renderError();
+            
+        } 
+        this.renderButton();
     };
     private renderError(title:string="Ups! Algo ha salido mal.") {
         if(this.container){

@@ -1,4 +1,5 @@
 export default (cedula:string) => {
+  if (!cedula) return false;
     const ced = cedula.split("").map(Number);
     let factor = 1;
     const result = ced.reduce((accum:number, curr:number, index:number) => {

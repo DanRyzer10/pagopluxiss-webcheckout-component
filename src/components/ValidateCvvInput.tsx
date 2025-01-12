@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "preact/hooks";
 
 export const ValidateCvvInput = ({
   validator,
+  block,
   errorMessage,
   onChange,
   name,
@@ -48,6 +49,7 @@ export const ValidateCvvInput = ({
         </label>
       )}
       <input
+        disabled={block}
         type="password"
         value={value}
         onInput={handleChange}

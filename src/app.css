@@ -123,12 +123,15 @@ body{
   padding: 0 20px;
 }
 .ppxiss-otp-input{
-  width: 100%;
+  width: 30px !important;
   height: 50px;
+  margin: 0 3px;
   outline: none;
   border: 1px solid #DADADA;
   border-radius: 20px;
-
+  font-weight: bold;
+  font-size: 18px;
+  color: #1D3AA0;
 }
 .ppxiss-modal-content{
   display: flex;
@@ -220,7 +223,7 @@ body{
   color: #DADADA;
 }
 .ppxiss-button-payiss-pay{
-  width: 200px;
+  width: 214px;
     border: none;
     color: #FFFFFF;
     text-align: center;
@@ -266,7 +269,7 @@ body{
 .ppxiss-button-split-info{
   font-size: 12px;
   position: absolute;
-  top: 17px;
+  top: 13px;
   left: 235px;
   background-color: white;
   border: none;

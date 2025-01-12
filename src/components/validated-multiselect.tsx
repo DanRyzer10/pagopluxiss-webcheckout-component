@@ -5,6 +5,7 @@ interface ValidatedSelectProps {
   errorMessage?: string;
   onChange: (name: string, value: string, isValid: boolean) => void;
   name: string;
+  block: boolean;
   label: string;
   options: any[];
   initialValue?: string;
@@ -60,6 +61,7 @@ const ValidatedMultiselect = ({ ...props }: ValidatedSelectProps) => {
         </label>
       )}
       <select
+        disabled={props.block}
         placeholder={"seleccione una opción"}
         onChange={handleChange}
         class={""}

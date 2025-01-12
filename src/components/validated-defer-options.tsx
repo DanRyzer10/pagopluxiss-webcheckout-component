@@ -6,6 +6,7 @@ interface ValidatedDeferOptions {
   onChange: (name: string, value: string, isValid: boolean) => void;
   name: string;
   label: string;
+  block: boolean;
   options: any[];
   initialValue?: string;
   onSendSelectedValue?: (value: {
@@ -46,6 +47,7 @@ const ValidatedDefer = ({ ...props }: ValidatedDeferOptions) => {
         </label>
       )}
       <select
+        disabled={props.block}
         placeholder={"seleccione una opción"}
         onChange={handleChange}
         class={""}

@@ -120,7 +120,7 @@ export function PaymentButton({
   //@ts-ignore
   const [payload, setPayload] = useState<payloadppx>();
   const [resendModal, setResendModal] = useState(false);
-  const [isVisibleModal, setVisibleModal] = useState(true);
+  const [isVisibleModal, setVisibleModal] = useState(false);
   const [responseppx, setResponse] = useState<responseppx>();
   const [isLoading, setIsLoading] = useState(false);
   const [clearValue, setClearValue] = useState(false);
@@ -396,6 +396,7 @@ export function PaymentButton({
           <label className="float-label">Propietario de Tarjeta</label>
           <div class={"col px-2 pt-2 "}>
             <ValidatedInput
+              block={isLoading}
               type="buyer"
               validator={cityIdValidation}
               errorMessage="Número de identificacion inválido"
@@ -410,6 +411,7 @@ export function PaymentButton({
           <div class={"row px-2 "}>
             <div class={"col "}>
               <ValidatedInput
+                block={isLoading}
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
@@ -424,6 +426,7 @@ export function PaymentButton({
             </div>
             <div class={"col"}>
               <ValidatedInput
+                block={isLoading}
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
@@ -441,6 +444,7 @@ export function PaymentButton({
           <div class={"row px-2 "}>
             <div class={"col"}>
               <ValidatedInput
+                block={isLoading}
                 type="buyer"
                 reset={clearValue}
                 validator={validateEmail}
@@ -470,6 +474,7 @@ export function PaymentButton({
             </div>
             <div class={"col-8 ps-0"}>
               <ValidatedInput
+                block={isLoading}
                 type="buyer"
                 style={{ borderRadius: "0px 20px 20px 0", height: "37px" }}
                 reset={clearValue}
@@ -498,6 +503,7 @@ export function PaymentButton({
             </div>
             <div class={"col"}>
               <ValidatedInput
+                block={isLoading}
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
@@ -515,6 +521,7 @@ export function PaymentButton({
           <div class={"row px-2 "}>
             <div class={"col "}>
               <ValidatedInput
+                block={isLoading}
                 type="buyer"
                 reset={clearValue}
                 validator={validateLettersWithPoints}
@@ -529,6 +536,7 @@ export function PaymentButton({
             </div>
             <div class={"col"}>
               <ValidatedInput
+                block={isLoading}
                 type="buyer"
                 reset={clearValue}
                 validator={validateZipCode}
@@ -554,7 +562,7 @@ export function PaymentButton({
                 }}
                 onClick={onShowMoreInfo}
               >
-                <svg
+                {/* <svg
                   width="10"
                   height="7"
                   viewBox="0 0 10 7"
@@ -567,6 +575,17 @@ export function PaymentButton({
                     d="M5 2.49658L0.812103 7L1.04139e-08 6.12671L5 0.75L10 6.12671L9.1879 7L5 2.49658Z"
                     fill="#212121"
                   />
+                </svg> */}
+                <svg
+                  width="25px"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <g id="arrow-circle-up" fill="#0085FF">
+                    <path d="M12,21a9,9,0,1,1,9-9A9,9,0,0,1,12,21ZM12,4.5A7.5,7.5,0,1,0,19.5,12,7.5,7.5,0,0,0,12,4.5Z" />
+                    <path d="M16,12.75a.74.74,0,0,1-.53-.22L12,9.06,8.53,12.53a.75.75,0,0,1-1.06-1.06l4-4a.75.75,0,0,1,1.06,0l4,4a.75.75,0,0,1,0,1.06A.74.74,0,0,1,16,12.75Z" />
+                    <path d="M12,16.75a.76.76,0,0,1-.75-.75V8a.75.75,0,0,1,1.5,0v8A.76.76,0,0,1,12,16.75Z" />
+                  </g>
                 </svg>
               </button>
             </div>
@@ -577,6 +596,7 @@ export function PaymentButton({
           <form id="ppxiss-card-form" class={""} onSubmit={onSubmit}>
             <div class={"col"}>
               <ValidatedInput
+                block={isLoading}
                 type="card"
                 reset={clearValue}
                 validator={validateCardNumber}
@@ -591,6 +611,7 @@ export function PaymentButton({
             <div class={"row "}>
               <div class={"col "}>
                 <ValidateDateInput
+                  block={isLoading}
                   reset={clearValue}
                   validator={validateExpiryDate}
                   errorMessage="Fecha de expiración inválida"
@@ -602,6 +623,7 @@ export function PaymentButton({
               </div>
               <div class={"col"}>
                 <ValidateCvvInput
+                  block={isLoading}
                   reset={resendModal || clearValue}
                   validator={validateCVV}
                   errorMessage="CVV inválido"
@@ -616,11 +638,12 @@ export function PaymentButton({
             <div class={"row mb-1"}>
               <div class={"col"}>
                 <ValidatedMultiselect
+                  block={isLoading}
                   validator={(value: string) => value.length > 0}
-                  errorMessage="Seleccione un país"
+                  errorMessage="Seleccione un tipo de credito"
                   onChange={handleInputChange}
                   onSendSelectedValue={handleSelectedCreditType}
-                  label="País"
+                  label="Tipo de Crédito"
                   name="creditType"
                   options={config.installmentCredit || []}
                   initialValue={""}
@@ -631,6 +654,7 @@ export function PaymentButton({
               <div class={"row mb-1"}>
                 <div class={"col"}>
                   <ValidatedDefer
+                    block={isLoading}
                     validator={(value: string) => value.length > 0}
                     errorMessage="Seleccione un plazo"
                     onChange={handleInputChange}
@@ -665,11 +689,46 @@ export function PaymentButton({
             activeButton={() => (isFormValid() as boolean) && !isLoading}
             disabledButton={() => !isFormValid() || isLoading}
           >
-            <span>
-              {config.module === "TOKENIZATION"
-                ? "Registrar tarjeta"
-                : `Pagar ${config.total_amount} ${config.currency}`}
-            </span>
+            <div class="d-flex justify-content-center align-items-center">
+              <span style={{ marginRight: "5px" }}>
+                {config.module === "TOKENIZATION"
+                  ? "Registrar tarjeta"
+                  : `Pagar ${config.total_amount} ${config.currency}`}
+              </span>
+              {isLoading && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="xMidYMid"
+                  width="17"
+                  height="17"
+                  style="shape-rendering: auto; display: block; background: transparent;"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
+                >
+                  <g>
+                    <circle
+                      stroke-dasharray="164.93361431346415 56.97787143782138"
+                      r="35"
+                      stroke-width="10"
+                      stroke="#ffffff"
+                      fill="none"
+                      cy="50"
+                      cx="50"
+                    >
+                      <animateTransform
+                        keyTimes="0;1"
+                        values="0 50 50;360 50 50"
+                        dur="3.7037037037037033s"
+                        repeatCount="indefinite"
+                        type="rotate"
+                        attributeName="transform"
+                      ></animateTransform>
+                    </circle>
+                    <g></g>
+                  </g>
+                </svg>
+              )}
+            </div>
           </SubmitButton>
         </div>
       </div>

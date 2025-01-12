@@ -6,6 +6,7 @@ export const ValidateDateInput = ({
   onChange,
   name,
   label,
+  block,
   reset,
   value: initialValue = "",
 }: any) => {
@@ -51,6 +52,7 @@ export const ValidateDateInput = ({
         </label>
       )}
       <input
+        disabled={block}
         type="text"
         id={name}
         value={value}

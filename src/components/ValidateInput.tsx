@@ -15,6 +15,7 @@ interface ValidatedInputProps {
   placeholder?: string;
   type?: string;
   value?: string;
+  block: boolean;
   isValid?: boolean;
   style?: CSSProperties; // Añadido para aceptar un objeto de estilo opcional
 }
@@ -25,6 +26,7 @@ export const ValidatedInput = ({
   name,
   label,
   reset,
+  block,
   placeholder,
   style,
   type,
@@ -67,6 +69,7 @@ export const ValidatedInput = ({
         </label>
       )}
       <input
+        disabled={block}
         style={style}
         type="text"
         value={value}
