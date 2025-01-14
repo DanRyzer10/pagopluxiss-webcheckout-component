@@ -26,6 +26,7 @@ export interface Payload {
     idEstablecimiento: string;
     urlRetorno3ds: string;
     urlRetornoExterno: string;
+    urlRetornoExtra?:string;
     paramsOtp?: {
         otpCode:string,
         

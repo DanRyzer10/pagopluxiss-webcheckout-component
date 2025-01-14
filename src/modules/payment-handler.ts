@@ -1,18 +1,20 @@
 import { ParamsVerifyPayment } from "../config/types/params-verify-payment";
 import { payloadppx } from "../config/types/payloadPagoplux";
 import { config } from "../config/types/setup";
-import { challengeUrl } from "../constants/constants";
+import { challengeUrl,callbackCardUrl,callbackUrlSuccess } from "../constants/constants";
 import { pagoPluxResponsesCodes } from "../enums/pagoplux-responses";
 import { ApiService } from "../services/api.service";
 
 export class PaymentHandler {
     private config: config;
+    private onError:Function;
     private readonly serviceUri = '/api/webcheckout/confirmPay';
     private apiService: ApiService | null = null;
     private modal: HTMLDivElement | null = null;
     private challengeUrlServer= challengeUrl;
-    constructor(config:config){
+    constructor(config:config,onError:Function){
         this.config = config;
+        this.onError = onError;
         this.initializePayment = this.initializePayment.bind(this);
         this.handlePaymentResponse = this.handlePaymentResponse.bind(this);
         this.verifyPayment = this.verifyPayment.bind(this);
@@ -23,9 +25,15 @@ export class PaymentHandler {
      setupVerificationListener(){
         window.addEventListener('message', async (event) => {
             console.log(event.data);
-
             if(event.data.type ==='3DS_COMPLETE'){
-                await this.verifyPayment(event.data.params)
+                await this.verifyPayment(event.data.data)
+            }else if(event.data.type==='TRANSACTION_SUCCESS'){
+                let redirect_url = new URL(this.config.redirect_url)
+                redirect_url.searchParams.append('id_transaccion',event.data.data.id_transaccion)
+                redirect_url.searchParams.append('status',event.data.data.status)
+                redirect_url.searchParams.append('token',event.data.data.token)
+                this.modal?.remove();
+                window.location.href=redirect_url.toString();
             }
         })
 
@@ -64,23 +72,23 @@ export class PaymentHandler {
         if(response?.data.code==0){
             const successUrl = new URL(this.config.redirect_url);
             const urlParams:any = {
-                transaction_id: response.detail.id_transaction,
-                status:response.status,
-                token:response.detail.token
+                transaction_id: response.data.detail.id_transaccion,
+                status:response.data.status,
+                token:response.data.detail.token
             }
             Object.keys(urlParams).forEach(key=>{
                 successUrl.searchParams.append(key,urlParams[key])
             })
             window.location.href = successUrl.toString();
         }else{
+            this.onError("Transacción no logró ser procesada.",true,response.data.code, response.data.description);
             throw new Error('Error al procesar el pago')
+            
         }
 
     }catch(error){
         console.error(error);
-        const errorUrl = new URL(this.config.redirect_url);
-        errorUrl.searchParams.append('status','ERROR');
-        window.location.href = errorUrl.toString();
+        this.onError("Transacción no logró ser procesada.",true,"2", "Error al procesar el pago");
     }
 
     }
@@ -96,9 +104,8 @@ export class PaymentHandler {
               .join('&');
             
             const fullUrl = `${challengeUrl}&${queryParams}`;
-            console.log(fullUrl);
-
-            this.open3DSChallenge(fullUrl);
+            const challengeUrlS = `${this.challengeUrlServer}?challengeUrl=${encodeURIComponent(fullUrl)}`;
+            this.openModalRedirect(challengeUrlS);
 
             return {status:'PENDING_3DS'}
 
@@ -111,6 +118,17 @@ export class PaymentHandler {
             }
         }
         else if(response.code==pagoPluxResponsesCodes["ok"]){
+            const paymentOkUrl = new URL(callbackUrlSuccess);
+            const urlParams:any = {
+                id_transaccion: response.detail.id_transaccion,
+                status:response.status,
+                token:response.detail.token
+            }
+            Object.keys(urlParams).forEach(key=>{
+                paymentOkUrl.searchParams.append(key,urlParams[key])
+            })
+
+            this.openModalRedirect(paymentOkUrl.toString())
             return {
                 status:'SUCCESS',
                 transaction_id:response.detail.transaction_id,
@@ -122,7 +140,11 @@ export class PaymentHandler {
                 status:'ERROR',
                 message:"Error en el establecimiento"
             }
-        }else{
+        }
+        else if(response?.code==pagoPluxResponsesCodes["otpIncorrect"]){
+            this.onError("Transacción no logró ser procesada.",true,response.code,"Código OTP incorrecto");
+        }
+        else{
             return {
                 status:'ERROR',
                 message:"Transacción no logró ser procesada." 
@@ -133,7 +155,7 @@ export class PaymentHandler {
     }
 
 
-    open3DSChallenge(challengeUrl:string) {
+    openModalRedirect(url:string) {
         // Crear un iframe modal para el desafío 3DS
         const modal = document.createElement('div');
         modal.style.cssText = `
@@ -157,23 +179,10 @@ export class PaymentHandler {
           background: white;
           border-radius: 8px;
         `;
-        iframe.onload = ()=>{
-           
-            
-        }
-        iframe.onformdata = (e)=>{
-            console.log('onformdata',e);
-        }
-        const challengeUrlS = `${this.challengeUrlServer}?challengeUrl=${encodeURIComponent(challengeUrl)}`;
-        console.log(challengeUrlS);
-        iframe.src = challengeUrlS;
-        iframe.addEventListener('message',()=>{
-            console.log('message');
-        })
+        iframe.src = url;
         modal.appendChild(iframe);
         document.body.appendChild(modal);
-        this.modal = modal;
-       
+        this.modal = modal;   
       }
 }
 

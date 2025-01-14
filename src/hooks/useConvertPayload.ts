@@ -4,6 +4,7 @@ import { useCallback } from "preact/hooks";
 import { Payload } from "../types/payloadType";
 import Encryptor from "../utils/encryptor";
 import { IFormData } from "../types/IFormData";
+import { callbackCardUrl } from "../constants/constants";
 
 const useConvertToPayload = (
     formData: IFormData,
@@ -48,8 +49,9 @@ const useConvertToPayload = (
             description: 'registrar tarjeta',
             clientIp: config.buyer.ipaddress,
             idEstablecimiento: btoa(config.setting.code),
-            urlRetorno3ds: config.redirect_url,
-            urlRetornoExterno: config.redirect_url,
+            urlRetorno3ds: callbackCardUrl,
+            urlRetornoExterno: callbackCardUrl,
+            urlRetornoExtra:config.redirect_url
           };
           setPayload(payload);
           resolve(payload);

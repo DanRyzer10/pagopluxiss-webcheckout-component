@@ -116,10 +116,10 @@ class IssPaymentButton {
         } 
         this.renderButton();
     };
-    private renderError(title:string="Ups! Algo ha salido mal.") {
+    private renderError(title:string="Ups! Algo ha salido mal.",isErrorPayment:boolean=false,errorCode:string="",errorMessage:string=""){ {
         if(this.container){
             render(
-                h(ErrorHandler,{businessname: this.config.business.name, email: this.config.business.email, number:this.config.business.phonenumber,title:title,fallback:()=>this.renderButton()}),
+                h(ErrorHandler,{businessname: this.config.business.name, email: this.config.business.email, number:this.config.business.phonenumber,title:title,fallback:()=>this.renderButton(),errorPayment:isErrorPayment,errorCode:errorCode,errorMessage:errorMessage}),
                 this.container
             )
     
@@ -127,6 +127,7 @@ class IssPaymentButton {
             throw new Error('Container element not found');
         }
     }
+}
     
     private renderButton() {
         if (this.container) {

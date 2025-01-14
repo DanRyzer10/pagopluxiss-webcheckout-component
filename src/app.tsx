@@ -254,19 +254,16 @@ export function PaymentButton({
         // response = await apiService.post(services.service_bridge, payload);
         // setResponse(response);
 
-        const paymentHandler = new PaymentHandler(config);
+        const paymentHandler = new PaymentHandler(config, onError);
         const response = await paymentHandler.initializePayment(
           services.service_bridge,
           payload
         );
         console.log(response);
-        if (response.status == "SUCCESS") {
-          onRedirect(config.redirect_url, response.response);
-        } else if (response.status == "PENDING_OTP") {
+        if (response?.status == "PENDING_OTP") {
           setVisibleModal(true);
           setResponse(response.response);
         }
-
         /**
          * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
          */
