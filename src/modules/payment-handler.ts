@@ -1,7 +1,7 @@
 import { ParamsVerifyPayment } from "../config/types/params-verify-payment";
 import { payloadppx } from "../config/types/payloadPagoplux";
 import { config } from "../config/types/setup";
-import { challengeUrl,callbackCardUrl,callbackUrlSuccess } from "../constants/constants";
+import { challengeUrl,callbackUrlSuccess, baseUrl } from "../constants/constants";
 import { pagoPluxResponsesCodes } from "../enums/pagoplux-responses";
 import { ApiService } from "../services/api.service";
 
@@ -18,13 +18,15 @@ export class PaymentHandler {
         this.initializePayment = this.initializePayment.bind(this);
         this.handlePaymentResponse = this.handlePaymentResponse.bind(this);
         this.verifyPayment = this.verifyPayment.bind(this);
-
         this.setupVerificationListener();
     }
 
      setupVerificationListener(){
+        const urlService = baseUrl
         window.addEventListener('message', async (event) => {
-            console.log(event.data);
+            if(!event.origin!=urlService){
+                return;
+            }
             if(event.data.type ==='3DS_COMPLETE'){
                 await this.verifyPayment(event.data.data)
             }else if(event.data.type==='TRANSACTION_SUCCESS'){
@@ -45,7 +47,7 @@ export class PaymentHandler {
                 this.config.setting.simetricKey
             );
             const response = await this.apiService.post(service,payload);
-            return this.handlePaymentResponse(response?.data);
+            return this.handlePaymentResponse(response);
         }catch(error){
             console.error(error);
             throw new Error('Error al procesar el pago');
@@ -69,19 +71,19 @@ export class PaymentHandler {
             document.body.removeChild(this.modal);
             this.modal=null;
         }
-        if(response?.data.code==0){
+        if(response?.code==0){
             const successUrl = new URL(this.config.redirect_url);
             const urlParams:any = {
-                transaction_id: response.data.detail.id_transaccion,
-                status:response.data.status,
-                token:response.data.detail.token
+                transaction_id: response.detail.id_transaccion,
+                status:response.status,
+                token:response.detail.token
             }
             Object.keys(urlParams).forEach(key=>{
                 successUrl.searchParams.append(key,urlParams[key])
             })
             window.location.href = successUrl.toString();
         }else{
-            this.onError("Transacción no logró ser procesada.",true,response.data.code, response.data.description);
+            this.onError("Transacción no logró ser procesada.",true,response.code, response.description);
             throw new Error('Error al procesar el pago')
             
         }
@@ -93,7 +95,6 @@ export class PaymentHandler {
 
     }
     handlePaymentResponse(response:any){
-        console.log(response);
         if(response.code==pagoPluxResponsesCodes["3ds"]){
             const challengeUrl = response.detail?.url;
             const params = response.detail.parameters;
@@ -186,15 +187,4 @@ export class PaymentHandler {
       }
 }
 
-declare global {
-    interface Window {
-        PaymentHandler: typeof PaymentHandler;
-    }
-}
 
-if(typeof module !='undefined' && module.exports){
-    module.exports = PaymentHandler;
-
-}else{
-    window.PaymentHandler = PaymentHandler;
-}

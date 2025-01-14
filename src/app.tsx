@@ -29,7 +29,6 @@ import { ValidateCvvInput } from "./components/ValidateCvvInput";
 import { OtpModal } from "./components/OtpModal";
 import { PaymentButtonProps, IDeferOptions } from "./types/appTypes";
 import { payloadppx } from "./config/types/payloadPagoplux";
-import { ApiService } from "./services/api.service";
 import { responseppx } from "./config/types/responseApi";
 import { CardBrand } from "./components/cardBrand";
 import "./app.css";
@@ -46,7 +45,6 @@ import ValidatedDefer from "./components/validated-defer-options";
 import ValidatedMultiselectCountry from "./components/multiselect-country";
 import ValidatedMultiSelectPhoneNumber from "./components/multi-select-phonenumber";
 import { PaymentHandler } from "./modules/payment-handler";
-import { resourceLimits } from "worker_threads";
 
 // #endregion
 
@@ -125,6 +123,7 @@ export function PaymentButton({
   const [isVisibleModal, setVisibleModal] = useState(false);
   const [responseppx, setResponse] = useState<responseppx>();
   const [isLoading, setIsLoading] = useState(false);
+  //@ts-ignore
   const [clearValue, setClearValue] = useState(false);
   const [otp, setOtp] = useState("");
   const [isDefer, setisDefer] = useState(false);
@@ -245,15 +244,7 @@ export function PaymentButton({
           otpCode: otp,
         };
       }
-      // let response: responseppx | undefined;
       try {
-        // const apiService = new ApiService(
-        //   config.setting.authorization,
-        //   config.setting.simetricKey
-        // );
-        // response = await apiService.post(services.service_bridge, payload);
-        // setResponse(response);
-
         const paymentHandler = new PaymentHandler(config, onError);
         const response = await paymentHandler.initializePayment(
           services.service_bridge,
@@ -264,54 +255,6 @@ export function PaymentButton({
           setVisibleModal(true);
           setResponse(response.response);
         }
-        /**
-         * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
-         */
-        // if (response?.code == 103) {
-        //   sessionStorage.setItem("ppxiss-auth", config.setting.authorization);
-        //   console.log("redireccion 3ds");
-        //   console.log(response);
-        //   //@ts-ignore
-        //   console.log(response.detail);
-        //   //validator 3ds
-        //   //@ts-ignore
-        //   const challengeUrl: any = response.detail?.url;
-        //   //@ts-ignore
-        //   const params: any = response.detail.parameters;
-        //   const queryParams = params
-        //     .map(
-        //       (param: any) =>
-        //         `${encodeURIComponent(param.name)}=${encodeURIComponent(
-        //           param.value
-        //         )}`
-        //     )
-        //     .join("&");
-        //   console.log("queryParams", queryParams);
-        //   const fullUrl: string = `${challengeUrl}&${queryParams}`;
-        //   console.log("fullUrl", fullUrl);
-        //   const redirectUrl: string = import.meta.env
-        //     .VITE_CHALLENGE_URL as string;
-        //   window.location.href = `${redirectUrl}?challengeUrl=${encodeURIComponent(
-        //     fullUrl
-        //   )}`;
-        // } else if (response?.code === 100) {
-        //   //otp validacion
-        //   setVisibleModal(true);
-        // } else if (response?.code === 0) {
-        //   //respuesta ok :)
-        //   onRedirect(config.redirect_url, response);
-        // } else if (response?.code === 3) {
-        //   onError();
-        //   console.error("Credenciales de establecimiento no encontradas");
-        // } else if (response?.code === 102) {
-        //   onError("");
-        // } else {
-        //   //
-        //   onError();
-        //   console.error(
-        //     `No se pudo realizar la transaccion. Comunicate con el establecmiento:\n mail :${config.business.email}\n telefono:${config.business.phonenumber}`
-        //   );
-        // }
       } catch (e) {
         console.error(e);
         onError("Error al procesar el pago");
@@ -351,23 +294,6 @@ export function PaymentButton({
     }
   }, [showMoreInfo]);
 
-  const onRedirect = (url: string, data: any) => {
-    setClearValue(true);
-    const baseUrl = url;
-    const transactionId = data.detail.id_transaccion;
-    const tokenCard = data.detail.token;
-    const params = {
-      transaction_id: transactionId,
-      token: tokenCard,
-      credit_code: selectedCreditType.code,
-      installment: formData.card.deferPay?.value ?? 0,
-    };
-    const queryParams = new URLSearchParams(
-      params as Record<string, string>
-    ).toString();
-    const fullUrl = `${baseUrl}?${queryParams}`;
-    window.location.href = fullUrl;
-  };
   const resendOtp = () => {
     setVisibleModal(false);
     setResendModal(true);
