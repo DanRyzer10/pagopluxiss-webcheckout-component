@@ -45,7 +45,6 @@ import ValidatedDefer from "./components/validated-defer-options";
 import ValidatedMultiselectCountry from "./components/multiselect-country";
 import ValidatedMultiSelectPhoneNumber from "./components/multi-select-phonenumber";
 import { PaymentHandler } from "./modules/payment-handler";
-
 // #endregion
 
 // #region COMPONENT APP
@@ -60,63 +59,89 @@ export function PaymentButton({
       number: { value: "", isValid: false },
       expirationDate: { value: "", isValid: false },
       cvv: { value: "", isValid: false },
-      creditType: {
-        value: config.installmentCredit ? config.installmentCredit[0].code : "",
-        isValid: true,
-      },
+      creditType: { value: "", isValid: true },
     },
     buyer: {
-      name: {
-        value: config.buyer.names,
-        isValid: validateOnlyLetters(config.buyer.names),
-      },
-      lastName: {
-        value: config.buyer.lastnames,
-        isValid: validateOnlyLetters(config.buyer.lastnames),
-      },
-      email: {
-        value: config.buyer.email,
-        isValid: validateEmail(config.buyer.email),
-      },
-      phone: {
-        value: config.buyer.phonenumber,
-        isValid: validatePhoneNumber(config.buyer.phonenumber),
-      },
-      address: {
-        value: config.shipping_address.street as string,
-        isValid: validateLettersWithPoints(
-          config.shipping_address.street as string
-        ),
-      },
-      city: {
-        value: config.shipping_address.city,
-        isValid: validateLettersWithPoints(config.shipping_address.city),
-      },
-      state: {
-        value: config.shipping_address.street as string,
-        isValid: validateLettersWithPoints(
-          config.shipping_address.street as string
-        ),
-      },
-      countryCode: {
-        value: config.buyer.countrycode,
-        isValid: validateLettersWithPoints(config.shipping_address.country),
-      },
-      street: {
-        value: config.shipping_address.street,
-        isValid: validateLettersWithPoints(config.shipping_address.street),
-      },
-      zipCode: {
-        value: config.shipping_address.number as string,
-        isValid: validateZipCode(config.shipping_address.number as string),
-      },
-      idNumber: {
-        value: config.buyer.identity,
-        isValid: cityIdValidation(config.buyer.identity),
-      },
-      idType: { value: config.buyer.document_type, isValid: true },
+      name: { value: "", isValid: false },
+      lastName: { value: "", isValid: false },
+      email: { value: "", isValid: false },
+      phone: { value: "", isValid: false },
+      address: { value: "", isValid: false },
+      city: { value: "", isValid: false },
+      state: { value: "", isValid: false },
+      countryCode: { value: "", isValid: false },
+      // street: { value: "", isValid: false },
+      number: { value: "", isValid: false },
+      idNumber: { value: "", isValid: false },
+      idType: { value: "", isValid: true },
     },
   });
+
+  useEffect(() => {
+    setFormData({
+      card: {
+        number: { value: "", isValid: false },
+        expirationDate: { value: "", isValid: false },
+        cvv: { value: "", isValid: false },
+        creditType: {
+          value: config.installmentCredit
+            ? config.installmentCredit[0].code
+            : "",
+          isValid: true,
+        },
+      },
+      buyer: {
+        name: {
+          value: config.buyer.names,
+          isValid: validateOnlyLetters(config.buyer.names),
+        },
+        lastName: {
+          value: config.buyer.lastnames,
+          isValid: validateOnlyLetters(config.buyer.lastnames),
+        },
+        email: {
+          value: config.buyer.email,
+          isValid: validateEmail(config.buyer.email),
+        },
+        phone: {
+          value: config.buyer.phonenumber,
+          isValid: validatePhoneNumber(config.buyer.phonenumber),
+        },
+        address: {
+          value: (config.shipping_address.street as string) || "",
+          isValid: validateLettersWithPoints(
+            config.shipping_address.street as string
+          ),
+        },
+        city: {
+          value: config.shipping_address.city || "",
+          isValid: validateLettersWithPoints(config.shipping_address.city),
+        },
+        state: {
+          value: config.shipping_address.street as string,
+          isValid: validateLettersWithPoints(
+            config.shipping_address.street as string
+          ),
+        },
+        countryCode: {
+          value: config.buyer.countrycode,
+          isValid: validateLettersWithPoints(config.shipping_address.country),
+        },
+
+        number: {
+          value: config.shipping_address.number
+            ? config.shipping_address.number
+            : "",
+          isValid: validateZipCode(config.shipping_address.number as string),
+        },
+        idNumber: {
+          value: config.buyer.identity,
+          isValid: cityIdValidation(config.buyer.identity),
+        },
+        idType: { value: config.buyer.document_type, isValid: true },
+      },
+    });
+  }, [config]);
   //@ts-ignore
   const [payload, setPayload] = useState<payloadppx>();
   const [resendModal, setResendModal] = useState(false);
@@ -140,6 +165,10 @@ export function PaymentButton({
       ? config.installmentCredit[0]
       : { code: "", installments: [], name: "" }
   );
+  /**
+   * @description Funcion que se encarga de manejar el cambio de la opcion seleccionada en el campo de tipo de credito
+   * @param value - Valor del campo
+   */
   const handleSelectedCreditType = (value: {
     code: string;
     installments: number[];
@@ -147,11 +176,10 @@ export function PaymentButton({
   }) => {
     setSelectedCreditType(value);
   };
+
   useEffect(() => {
     if (!selectedCreditType) return;
     let installments: any[] = selectedCreditType.installments;
-    console.log(formData);
-    console.log("installments ", installments);
     if (installments.length > 0) {
       const installmentOptions: IDeferOptions[] =
         convertToDeferredOptions(installments);
@@ -164,7 +192,6 @@ export function PaymentButton({
         },
         buyer: prevData.buyer,
       }));
-      console.log(formData);
     } else {
       setisDefer(false);
       const { deferPay, ...rest } = formData.card;
@@ -223,14 +250,26 @@ export function PaymentButton({
       Object.values(formData.buyer).every((field) => field.isValid)
     );
   };
+  /**
+   * @description Valida si los campos del formulario del comprador son validos
+   * @returns {boolean} - Retorna true si todos los campos del formulario del comprador son validos
+   * @memberof PaymentButton
+   */
   const validateBuyerInfo = useMemo(() => {
     return (
       formData.buyer &&
       Object.values(formData.buyer).every((field) => field.isValid)
     );
   }, [formData.buyer]);
+
   const ConvertToPayload = useConvertToPayload(formData, config, setPayload);
   // #region POSTDATA FORM
+
+  /**
+   * @description Funcion que se encarga de enviar los datos del formulario al servidor
+   * @param e
+   * @param action  - accion a realizar. envio de datos o validacion de otp
+   */
   const handleSubmit = async (e: any, action: "submit" | "otp") => {
     e.preventDefault();
     setIsLoading(true);
@@ -250,7 +289,6 @@ export function PaymentButton({
           services.service_bridge,
           payload
         );
-        console.log(response);
         if (response?.status == "PENDING_OTP") {
           setVisibleModal(true);
           setResponse(response.response);
@@ -293,7 +331,11 @@ export function PaymentButton({
       });
     }
   }, [showMoreInfo]);
-
+  /**
+   * @description Funcion que se encarga de reenviar el otp al servidor.limpia el formulario de cvv
+   * @memberof PaymentButton
+   *
+   */
   const resendOtp = () => {
     setVisibleModal(false);
     setResendModal(true);
@@ -324,8 +366,8 @@ export function PaymentButton({
           <CardBrand
             cardNumber={formData?.card?.number?.value || ""}
             expiredDate={formData?.card?.expirationDate.value || ""}
-            names={config.buyer?.names}
-            lastnames={config.buyer.lastnames}
+            names={formData.buyer?.name.value || ""}
+            lastnames={formData.buyer?.lastName.value || ""}
           />
         </div>
       </div>
@@ -435,7 +477,7 @@ export function PaymentButton({
                 errorMessage="Seleccione un país"
                 onChange={handleInputChange}
                 label="País"
-                name="countryCode"
+                name="country"
                 initialValue={useCountrie}
               />
             </div>
@@ -448,7 +490,7 @@ export function PaymentButton({
                 errorMessage="Ciudad inválida"
                 onChange={handleInputChange}
                 label="Ciudad"
-                name="clientCity"
+                name="city"
                 placeholder="Ingrese su ciudad"
                 value={formData.buyer?.city.value}
                 isValid={formData.buyer?.city.isValid}
@@ -466,10 +508,10 @@ export function PaymentButton({
                 errorMessage="Direccion invalida"
                 onChange={handleInputChange}
                 label="Dirección"
-                name="clientAddress"
+                name="address"
                 placeholder="Ingrese su dirección"
-                value={formData.buyer?.state.value}
-                isValid={formData.buyer?.state.isValid}
+                value={formData.buyer?.address.value}
+                isValid={formData.buyer?.address.isValid}
               ></ValidatedInput>
             </div>
             <div class={"col"}>
@@ -481,10 +523,10 @@ export function PaymentButton({
                 errorMessage="Número de casa inválido"
                 onChange={handleInputChange}
                 label="Número"
-                name="clientZipCode"
+                name="number"
                 placeholder="Ingrese su número de casa"
-                value={formData.buyer?.zipCode.value}
-                isValid={formData.buyer?.zipCode.isValid}
+                value={formData.buyer?.number.value}
+                isValid={formData.buyer?.number.isValid}
               ></ValidatedInput>
             </div>
           </div>
@@ -500,20 +542,6 @@ export function PaymentButton({
                 }}
                 onClick={onShowMoreInfo}
               >
-                {/* <svg
-                  width="10"
-                  height="7"
-                  viewBox="0 0 10 7"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M5 2.49658L0.812103 7L1.04139e-08 6.12671L5 0.75L10 6.12671L9.1879 7L5 2.49658Z"
-                    fill="#212121"
-                  />
-                </svg> */}
                 <svg
                   width="25px"
                   xmlns="http://www.w3.org/2000/svg"

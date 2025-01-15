@@ -1,7 +1,7 @@
 import { ParamsVerifyPayment } from "../config/types/params-verify-payment";
 import { payloadppx } from "../config/types/payloadPagoplux";
 import { config } from "../config/types/setup";
-import { challengeUrl,callbackUrlSuccess, baseUrl } from "../constants/constants";
+import { challengeUrl,callbackUrlSuccess } from "../constants/constants";
 import { pagoPluxResponsesCodes } from "../enums/pagoplux-responses";
 import { ApiService } from "../services/api.service";
 
@@ -22,11 +22,7 @@ export class PaymentHandler {
     }
 
      setupVerificationListener(){
-        const urlService = baseUrl
         window.addEventListener('message', async (event) => {
-            if(!event.origin!=urlService){
-                return;
-            }
             if(event.data.type ==='3DS_COMPLETE'){
                 await this.verifyPayment(event.data.data)
             }else if(event.data.type==='TRANSACTION_SUCCESS'){
