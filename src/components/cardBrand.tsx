@@ -14,6 +14,23 @@ export const CardBrand = ({
 }: CardBrandProps) => {
   const [cardLayer, setCardLayer] = useState<string>("XXXX XXXX XXXX XXXX");
   const [expiredDateLayer, setExpiredDateLayer] = useState<string>("MM/YY");
+  const [namesLayer, setNamesLayer] = useState<string>(names);
+  const [lastnamesLayer, setLastnamesLayer] = useState<string>(lastnames);
+
+  const onUpdateNamesLayer = (n: string) => {
+    let updateNamesLayer = n;
+    if (n.length > 12) {
+      updateNamesLayer = n.slice(0, 12);
+    }
+    setNamesLayer(updateNamesLayer);
+  };
+  const onUpdateLastnamesLayer = (ln: string) => {
+    let updateLastnamesLayer = ln;
+    if (ln.length > 12) {
+      updateLastnamesLayer = ln.slice(0, 12);
+    }
+    setLastnamesLayer(updateLastnamesLayer);
+  };
 
   const onUpdateCardLayer = (cN: string) => {
     const firstx = cN.slice(0, 4);
@@ -46,6 +63,13 @@ export const CardBrand = ({
   useEffect(() => {
     onUpdateDateLayer(expiredDate);
   }, [expiredDate]);
+  useEffect(() => {
+    console.log("names", names);
+    onUpdateNamesLayer(names);
+  }, [names]);
+  useEffect(() => {
+    onUpdateLastnamesLayer(lastnames);
+  }, [lastnames]);
 
   return (
     <div className="ppxiss-card-brand-container container">
@@ -62,9 +86,11 @@ export const CardBrand = ({
             "col d-flex justify-content-start ppxiss-card-brand-font-medium"
           }
         >
-          {names.length + lastnames.length + 1 > 12
-            ? names.slice(0, 1) + ". " + lastnames.slice(0, 11 - names.length)
-            : names + " " + lastnames}
+          {namesLayer.length + lastnamesLayer.length + 1 > 12
+            ? namesLayer.slice(0, 1) +
+              ". " +
+              lastnamesLayer.slice(0, 11 - names.length)
+            : namesLayer + " " + lastnamesLayer}
         </div>
         <div
           class={"col d-flex justify-content-end ppxiss-card-brand-font-small"}

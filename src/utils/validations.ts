@@ -20,6 +20,7 @@ export function validateOtp(otp:string){
     return regex.test(otp) ;
 }
 export function validateOnlyLetters(text:string) {
+    if(!text) return false;
     //reges with letters, points an spaces
     const regex = /^[A-Za-z\s\.\,]+$/;
     return regex.test(text);
@@ -30,6 +31,7 @@ export function validateEmail(email:string) {
     return regex.test(email);
 }
 export  function validateLettersWithPoints(text:string){
+    if(!text) return false;
     //validar solo letras y puntos y espacios
     const regex = /^[A-Za-z\s\.\,]+$/;
     return regex.test(text);
@@ -40,7 +42,7 @@ export function validatePhoneNumber(phooneNumber:string){
     return regex.test(phooneNumber);
 }
 export function validateZipCode(zipCode:string){
-    if(!zipCode) return true;
+    if(!zipCode) return false;
     const regex = /^(?:[A-Z0-9]+([- ]?[A-Z0-9]+)*)?$/;
     return regex.test(zipCode);
 }

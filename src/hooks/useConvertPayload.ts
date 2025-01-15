@@ -41,7 +41,7 @@ const useConvertToPayload = (
             shippingAddress: {
               country: config.shipping_address.country,
               city: formData.buyer?.city.value as string,
-              street: formData.buyer?.street.value as string,
+              street: formData.buyer?.address.value as string,
               number: formData.buyer?.number.value as string,
             },
             paramsRecurrent: {},
