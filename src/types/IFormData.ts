@@ -16,7 +16,7 @@ export interface IFormData {
         countryCode:IFormOption,
         street:IFormOption,
         state:IFormOption,
-        zipCode:IFormOption,
+        number:IFormOption,
         idNumber:IFormOption,
         idType:IFormOption
     }

@@ -20,7 +20,8 @@ export function validateOtp(otp:string){
     return regex.test(otp) ;
 }
 export function validateOnlyLetters(text:string) {
-    const regex = /^[a-zA-Z]+$/;
+    //reges with letters, points an spaces
+    const regex = /^[A-Za-z\s\.\,]+$/;
     return regex.test(text);
 }
 
@@ -39,6 +40,7 @@ export function validatePhoneNumber(phooneNumber:string){
     return regex.test(phooneNumber);
 }
 export function validateZipCode(zipCode:string){
+    if(!zipCode) return true;
     const regex = /^(?:[A-Z0-9]+([- ]?[A-Z0-9]+)*)?$/;
     return regex.test(zipCode);
 }

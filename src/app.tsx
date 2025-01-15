@@ -29,7 +29,6 @@ import { ValidateCvvInput } from "./components/ValidateCvvInput";
 import { OtpModal } from "./components/OtpModal";
 import { PaymentButtonProps, IDeferOptions } from "./types/appTypes";
 import { payloadppx } from "./config/types/payloadPagoplux";
-import { ApiService } from "./services/api.service";
 import { responseppx } from "./config/types/responseApi";
 import { CardBrand } from "./components/cardBrand";
 import "./app.css";
@@ -46,8 +45,6 @@ import ValidatedDefer from "./components/validated-defer-options";
 import ValidatedMultiselectCountry from "./components/multiselect-country";
 import ValidatedMultiSelectPhoneNumber from "./components/multi-select-phonenumber";
 import { PaymentHandler } from "./modules/payment-handler";
-import { resourceLimits } from "worker_threads";
-
 // #endregion
 
 // #region COMPONENT APP
@@ -108,8 +105,10 @@ export function PaymentButton({
         value: config.shipping_address.street,
         isValid: validateLettersWithPoints(config.shipping_address.street),
       },
-      zipCode: {
-        value: config.shipping_address.number as string,
+      number: {
+        value: config.shipping_address.number
+          ? config.shipping_address.number
+          : "",
         isValid: validateZipCode(config.shipping_address.number as string),
       },
       idNumber: {
@@ -125,6 +124,7 @@ export function PaymentButton({
   const [isVisibleModal, setVisibleModal] = useState(false);
   const [responseppx, setResponse] = useState<responseppx>();
   const [isLoading, setIsLoading] = useState(false);
+  //@ts-ignore
   const [clearValue, setClearValue] = useState(false);
   const [otp, setOtp] = useState("");
   const [isDefer, setisDefer] = useState(false);
@@ -141,6 +141,10 @@ export function PaymentButton({
       ? config.installmentCredit[0]
       : { code: "", installments: [], name: "" }
   );
+  /**
+   * @description Funcion que se encarga de manejar el cambio de la opcion seleccionada en el campo de tipo de credito
+   * @param value - Valor del campo
+   */
   const handleSelectedCreditType = (value: {
     code: string;
     installments: number[];
@@ -148,11 +152,10 @@ export function PaymentButton({
   }) => {
     setSelectedCreditType(value);
   };
+
   useEffect(() => {
     if (!selectedCreditType) return;
     let installments: any[] = selectedCreditType.installments;
-    console.log(formData);
-    console.log("installments ", installments);
     if (installments.length > 0) {
       const installmentOptions: IDeferOptions[] =
         convertToDeferredOptions(installments);
@@ -165,7 +168,6 @@ export function PaymentButton({
         },
         buyer: prevData.buyer,
       }));
-      console.log(formData);
     } else {
       setisDefer(false);
       const { deferPay, ...rest } = formData.card;
@@ -224,14 +226,26 @@ export function PaymentButton({
       Object.values(formData.buyer).every((field) => field.isValid)
     );
   };
+  /**
+   * @description Valida si los campos del formulario del comprador son validos
+   * @returns {boolean} - Retorna true si todos los campos del formulario del comprador son validos
+   * @memberof PaymentButton
+   */
   const validateBuyerInfo = useMemo(() => {
     return (
       formData.buyer &&
       Object.values(formData.buyer).every((field) => field.isValid)
     );
   }, [formData.buyer]);
+
   const ConvertToPayload = useConvertToPayload(formData, config, setPayload);
   // #region POSTDATA FORM
+
+  /**
+   * @description Funcion que se encarga de enviar los datos del formulario al servidor
+   * @param e
+   * @param action  - accion a realizar. envio de datos o validacion de otp
+   */
   const handleSubmit = async (e: any, action: "submit" | "otp") => {
     e.preventDefault();
     setIsLoading(true);
@@ -245,73 +259,16 @@ export function PaymentButton({
           otpCode: otp,
         };
       }
-      // let response: responseppx | undefined;
       try {
-        // const apiService = new ApiService(
-        //   config.setting.authorization,
-        //   config.setting.simetricKey
-        // );
-        // response = await apiService.post(services.service_bridge, payload);
-        // setResponse(response);
-
         const paymentHandler = new PaymentHandler(config, onError);
         const response = await paymentHandler.initializePayment(
           services.service_bridge,
           payload
         );
-        console.log(response);
         if (response?.status == "PENDING_OTP") {
           setVisibleModal(true);
           setResponse(response.response);
         }
-        /**
-         * TODO- validar el las diferentes respuestas por el codigo que retorna pagoplux
-         */
-        // if (response?.code == 103) {
-        //   sessionStorage.setItem("ppxiss-auth", config.setting.authorization);
-        //   console.log("redireccion 3ds");
-        //   console.log(response);
-        //   //@ts-ignore
-        //   console.log(response.detail);
-        //   //validator 3ds
-        //   //@ts-ignore
-        //   const challengeUrl: any = response.detail?.url;
-        //   //@ts-ignore
-        //   const params: any = response.detail.parameters;
-        //   const queryParams = params
-        //     .map(
-        //       (param: any) =>
-        //         `${encodeURIComponent(param.name)}=${encodeURIComponent(
-        //           param.value
-        //         )}`
-        //     )
-        //     .join("&");
-        //   console.log("queryParams", queryParams);
-        //   const fullUrl: string = `${challengeUrl}&${queryParams}`;
-        //   console.log("fullUrl", fullUrl);
-        //   const redirectUrl: string = import.meta.env
-        //     .VITE_CHALLENGE_URL as string;
-        //   window.location.href = `${redirectUrl}?challengeUrl=${encodeURIComponent(
-        //     fullUrl
-        //   )}`;
-        // } else if (response?.code === 100) {
-        //   //otp validacion
-        //   setVisibleModal(true);
-        // } else if (response?.code === 0) {
-        //   //respuesta ok :)
-        //   onRedirect(config.redirect_url, response);
-        // } else if (response?.code === 3) {
-        //   onError();
-        //   console.error("Credenciales de establecimiento no encontradas");
-        // } else if (response?.code === 102) {
-        //   onError("");
-        // } else {
-        //   //
-        //   onError();
-        //   console.error(
-        //     `No se pudo realizar la transaccion. Comunicate con el establecmiento:\n mail :${config.business.email}\n telefono:${config.business.phonenumber}`
-        //   );
-        // }
       } catch (e) {
         console.error(e);
         onError("Error al procesar el pago");
@@ -350,24 +307,11 @@ export function PaymentButton({
       });
     }
   }, [showMoreInfo]);
-
-  const onRedirect = (url: string, data: any) => {
-    setClearValue(true);
-    const baseUrl = url;
-    const transactionId = data.detail.id_transaccion;
-    const tokenCard = data.detail.token;
-    const params = {
-      transaction_id: transactionId,
-      token: tokenCard,
-      credit_code: selectedCreditType.code,
-      installment: formData.card.deferPay?.value ?? 0,
-    };
-    const queryParams = new URLSearchParams(
-      params as Record<string, string>
-    ).toString();
-    const fullUrl = `${baseUrl}?${queryParams}`;
-    window.location.href = fullUrl;
-  };
+  /**
+   * @description Funcion que se encarga de reenviar el otp al servidor.limpia el formulario de cvv
+   * @memberof PaymentButton
+   *
+   */
   const resendOtp = () => {
     setVisibleModal(false);
     setResendModal(true);
@@ -522,7 +466,7 @@ export function PaymentButton({
                 errorMessage="Ciudad inválida"
                 onChange={handleInputChange}
                 label="Ciudad"
-                name="clientCity"
+                name="city"
                 placeholder="Ingrese su ciudad"
                 value={formData.buyer?.city.value}
                 isValid={formData.buyer?.city.isValid}
@@ -540,7 +484,7 @@ export function PaymentButton({
                 errorMessage="Direccion invalida"
                 onChange={handleInputChange}
                 label="Dirección"
-                name="clientAddress"
+                name="address"
                 placeholder="Ingrese su dirección"
                 value={formData.buyer?.state.value}
                 isValid={formData.buyer?.state.isValid}
@@ -555,10 +499,10 @@ export function PaymentButton({
                 errorMessage="Número de casa inválido"
                 onChange={handleInputChange}
                 label="Número"
-                name="clientZipCode"
+                name="clientNumberHouse"
                 placeholder="Ingrese su número de casa"
-                value={formData.buyer?.zipCode.value}
-                isValid={formData.buyer?.zipCode.isValid}
+                value={formData.buyer?.number.value}
+                isValid={formData.buyer?.number.isValid}
               ></ValidatedInput>
             </div>
           </div>
@@ -574,20 +518,6 @@ export function PaymentButton({
                 }}
                 onClick={onShowMoreInfo}
               >
-                {/* <svg
-                  width="10"
-                  height="7"
-                  viewBox="0 0 10 7"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M5 2.49658L0.812103 7L1.04139e-08 6.12671L5 0.75L10 6.12671L9.1879 7L5 2.49658Z"
-                    fill="#212121"
-                  />
-                </svg> */}
                 <svg
                   width="25px"
                   xmlns="http://www.w3.org/2000/svg"

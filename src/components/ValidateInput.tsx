@@ -61,6 +61,11 @@ export const ValidatedInput = ({
     }
   }, [reset]);
 
+  useEffect(() => {
+    setValue(initialValue);
+    setError(initialIsValid ? "" : errorMessage);
+  }, [initialValue, initialIsValid, errorMessage]);
+
   return (
     <div className="ppxiss-input-field-container">
       {!error && (
