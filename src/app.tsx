@@ -68,7 +68,8 @@ export function PaymentButton({
       phone: { value: "", isValid: false },
       address: { value: "", isValid: false },
       city: { value: "", isValid: false },
-      state: { value: "", isValid: false },
+      country: { value: "", isValid: false },
+      phoneCode: { value: "", isValid: false },
       countryCode: { value: "", isValid: false },
       // street: { value: "", isValid: false },
       number: { value: "", isValid: false },
@@ -78,6 +79,7 @@ export function PaymentButton({
   });
 
   useEffect(() => {
+    const countryCode: any = localStorage.getItem("c_cc");
     setFormData({
       card: {
         number: { value: "", isValid: false },
@@ -113,15 +115,17 @@ export function PaymentButton({
             config.shipping_address.street as string
           ),
         },
+        country: {
+          value: countryCode?.attributes?.code || config.buyer.countrycode,
+          isValid: true,
+        },
+        phoneCode: {
+          value: countryCode?.attributes?.number || config.buyer.countrycode,
+          isValid: true,
+        },
         city: {
           value: config.shipping_address.city || "",
           isValid: validateLettersWithPoints(config.shipping_address.city),
-        },
-        state: {
-          value: config.shipping_address.street as string,
-          isValid: validateLettersWithPoints(
-            config.shipping_address.street as string
-          ),
         },
         countryCode: {
           value: config.buyer.countrycode,
@@ -230,7 +234,6 @@ export function PaymentButton({
       isValid: any,
       target: "card" | "buyer" = "card"
     ) => {
-      console.log(formData);
       //@ts-ignore
       setFormData((prevData: any) => ({
         ...prevData,
@@ -256,6 +259,7 @@ export function PaymentButton({
    * @memberof PaymentButton
    */
   const validateBuyerInfo = useMemo(() => {
+    console.log("formData.buyer: ", formData);
     return (
       formData.buyer &&
       Object.values(formData.buyer).every((field) => field.isValid)
@@ -315,7 +319,7 @@ export function PaymentButton({
   }, [showMoreInfo]);
 
   useEffect(() => {
-    const currCountrieCode: any = formData.buyer?.countryCode.value;
+    const currCountrieCode: any = config.buyer.countrycode;
     let isFetched = localStorage.getItem("fe_cou");
     if (!showMoreInfo && !isFetched) {
       const { getCountrie } = useFindCountrieByNumber(currCountrieCode);
@@ -330,7 +334,7 @@ export function PaymentButton({
         }
       });
     }
-  }, [showMoreInfo]);
+  }, [showMoreInfo, config]);
   /**
    * @description Funcion que se encarga de reenviar el otp al servidor.limpia el formulario de cvv
    * @memberof PaymentButton
@@ -446,9 +450,10 @@ export function PaymentButton({
                   value.code !== "" && value.name !== ""
                 }
                 errorMessage="código inválido"
+                type="buyer"
                 onChange={handleInputChange}
                 label="Teléfono"
-                name="phone"
+                name="phoneCode"
                 initialValue={useCountrie}
               />
             </div>
@@ -474,6 +479,7 @@ export function PaymentButton({
             <div class={"col "}>
               <ValidatedMultiselectCountry
                 validator={(value: string) => value.length > 0}
+                type="buyer"
                 errorMessage="Seleccione un país"
                 onChange={handleInputChange}
                 label="País"
@@ -566,7 +572,7 @@ export function PaymentButton({
                 type="card"
                 reset={clearValue}
                 validator={validateCardNumber}
-                errorMessage="Número de tarjeta inválida"
+                errorMessage="Número de tarjeta inválido"
                 onChange={handleInputChange}
                 label="Número de tarjeta"
                 name="number"

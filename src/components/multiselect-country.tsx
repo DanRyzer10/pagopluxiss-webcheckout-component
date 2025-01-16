@@ -4,9 +4,16 @@ import useGetCountries from "../api/use-get-countries";
 interface ValidatedSelectCountryProps {
   validator: (value: string) => boolean;
   errorMessage?: string;
-  onChange: (name: string, value: string, isValid: boolean) => void;
+  onChange: (
+    name: any,
+    value: any,
+    //@ts-ignore
+    isValid: any,
+    target: "card" | "buyer"
+  ) => void;
   name: string;
   label: string;
+  type?: "card" | "buyer";
   initialValue?: CountryOption;
 }
 
@@ -31,6 +38,7 @@ const ValidatedMultiselectCountry = ({
   onChange,
   name,
   label,
+  type,
   initialValue = {
     attributes: {
       code: "",
@@ -88,15 +96,20 @@ const ValidatedMultiselectCountry = ({
       fetchOptions(nextPage);
     }
   };
+  useEffect(() => {
+    console.log("Selected option:", selectedOption);
+    localStorage.setItem("c_cc", JSON.stringify(selectedOption));
+  }, [selectedOption]);
 
   const handleSelect = (option: CountryOption) => {
     setSelectedOption(option);
     const isValid = validator(option.attributes.code);
     const errorMsg = isValid ? "" : errorMessage;
     setError(errorMsg || "");
-    onChange(name, option.attributes.code, isValid);
-    console.log("Selected option:", selectedOption);
+    onChange(name, option.attributes.code, isValid, type || "card");
     setIsOpen(false);
+
+    console.log("Selected option:", selectedOption);
   };
 
   return (
@@ -112,7 +125,7 @@ const ValidatedMultiselectCountry = ({
           className="dropdown-header"
           onClick={() => setIsOpen((prev) => !prev)}
         >
-          {selectedOption.attributes.code ? (
+          {selectedOption.attributes?.code ? (
             <span>
               <span
                 dangerouslySetInnerHTML={{
@@ -125,7 +138,7 @@ const ValidatedMultiselectCountry = ({
                 : selectedOption.attributes.name}
             </span>
           ) : (
-            "Select a country"
+            "país"
           )}
         </div>
         {isOpen && (
