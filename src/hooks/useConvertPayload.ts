@@ -35,11 +35,11 @@ const useConvertToPayload = (
               documentNumber: formData.buyer?.idNumber.value as string,
               firstName: formData.buyer?.name.value as string,
               lastName: formData.buyer?.lastName.value as string,
-              phone: `${formData.buyer?.countryCode.value}${formData.buyer?.phone.value}`,
+              phone: `${formData.buyer?.phoneCode?.value || ""}${formData.buyer?.phone.value}`,
               email: formData.buyer?.email.value as string,
             },
             shippingAddress: {
-              country: config.shipping_address.country,
+              country: formData.buyer?.country?.value  || config.buyer.countrycode,
               city: formData.buyer?.city.value as string,
               street: formData.buyer?.address.value as string,
               number: formData.buyer?.number.value as string,

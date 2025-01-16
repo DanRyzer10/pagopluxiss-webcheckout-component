@@ -1,6 +1,5 @@
-
 export function validateCardNumber(cardNumber:string) {
-    const regex = /^\d{14,16}$/;
+    const regex = /^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/;
     return regex.test(cardNumber);
 }
 
@@ -33,8 +32,7 @@ export function validateEmail(email:string) {
 }
 export  function validateLettersWithPoints(text:string){
     if(!text) return false;
-    //validar solo letras y puntos y espacios
-    const regex = /^[A-Za-z\s\.\,]+$/;
+    const regex = /^[A-Za-z0-9\s\.\,]+$/;
     return regex.test(text);
 }
 export function validatePhoneNumber(phooneNumber:string){
@@ -44,8 +42,9 @@ export function validatePhoneNumber(phooneNumber:string){
 }
 export function validateZipCode(zipCode:string){
     if(!zipCode) return false;
-    const regex = /^(?:[A-Z0-9]+([- ]?[A-Z0-9]+)*)?$/;
-    return regex.test(zipCode);
+    //regex vaidated for 3 digits and not aceppt 000 and values greater than 999 and less than 0
+    const regex = /^(?!000)\d{3}$/;
+    return regex.test(zipCode); 
 }
 export function validateIdentificationNumber(idNumber:string,type:string){
     if(type==='ID'){
@@ -61,7 +60,3 @@ export function validateIdentificationNumber(idNumber:string,type:string){
         return regex.test(idNumber);
     }
 }
-
-
-
- 

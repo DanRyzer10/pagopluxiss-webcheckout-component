@@ -14,8 +14,10 @@ export interface IFormData {
         address:IFormOption,
         city:IFormOption,
         countryCode:IFormOption,
+        phoneCode?:IFormOption,
+        country?:IFormOption,
+        // street:IFormOption,
         number:IFormOption,
-        state:IFormOption,
         idNumber:IFormOption,
         idType:IFormOption
     }

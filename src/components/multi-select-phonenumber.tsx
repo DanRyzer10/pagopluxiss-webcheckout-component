@@ -3,9 +3,16 @@ import useGetCountries from "../api/use-get-countries";
 interface ValidatedSelectCountryProps {
   validator: (value: string) => boolean;
   errorMessage?: string;
-  onChange: (name: string, value: string, isValid: boolean) => void;
+  onChange: (
+    name: any,
+    value: any,
+    //@ts-ignore
+    isValid: any,
+    target: "card" | "buyer"
+  ) => void;
   name: string;
   label: string;
+  type?: "card" | "buyer";
   initialValue?: CountryOption;
 }
 interface CountryOption {
@@ -26,6 +33,7 @@ interface CountryOption {
 const ValidatedMultiSelectPhoneNumber = ({
   validator,
   errorMessage,
+  type,
   onChange,
   name,
   initialValue = {
@@ -91,7 +99,7 @@ const ValidatedMultiSelectPhoneNumber = ({
     const isValid = validator(option.attributes.code);
     const errorMsg = isValid ? "" : errorMessage;
     setError(errorMsg || "");
-    onChange(name, option.attributes.code, isValid);
+    onChange(name, option.attributes.code, isValid, type || "card");
     console.log("Selected option:", selectedOption);
     setIsOpen(false);
   };
@@ -109,10 +117,10 @@ const ValidatedMultiSelectPhoneNumber = ({
           className="dropdown-header-alter"
           onClick={() => setIsOpen((prev) => !prev)}
         >
-          {selectedOption.attributes.code ? (
+          {selectedOption.attributes?.code ? (
             <span>{`+${selectedOption.attributes.number} `}</span>
           ) : (
-            "Select a country"
+            "+"
           )}
         </div>
         {isOpen && (
