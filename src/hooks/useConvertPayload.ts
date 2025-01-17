@@ -39,7 +39,7 @@ const useConvertToPayload = (
               email: formData.buyer?.email.value as string,
             },
             shippingAddress: {
-              country: formData.buyer?.country?.value  || config.buyer.countrycode,
+              country: formData.buyer?.country?.value.toString()  || config.buyer.countrycode,
               city: formData.buyer?.city.value as string,
               street: formData.buyer?.address.value as string,
               number: formData.buyer?.number.value as string,
