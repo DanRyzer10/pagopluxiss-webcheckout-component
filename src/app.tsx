@@ -383,7 +383,7 @@ export function PaymentButton({
               block={isLoading}
               type="buyer"
               validator={cityIdValidation}
-              errorMessage="Número de identificacion inválido"
+              errorMessage="Solo números del 0 al 9"
               onChange={handleInputChange}
               label="Cédula, RUC o Pasaporte"
               name="idNumber"
@@ -399,7 +399,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
-                errorMessage="Nombre inválido"
+                errorMessage="Solo letras de la A a la Z"
                 onChange={handleInputChange}
                 label="Nombre"
                 name="name"
@@ -414,7 +414,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
-                errorMessage="Apellido inválido"
+                errorMessage="Solo letras de la A a la Z"
                 onChange={handleInputChange}
                 label="Apellido"
                 name="lastName"
@@ -449,7 +449,7 @@ export function PaymentButton({
                 validator={(value: any) =>
                   value.code !== "" && value.name !== ""
                 }
-                errorMessage="código inválido"
+                errorMessage="Seleccionar país"
                 type="buyer"
                 onChange={handleInputChange}
                 label="Teléfono"
@@ -464,7 +464,7 @@ export function PaymentButton({
                 style={{ borderRadius: "0px 20px 20px 0", height: "37px" }}
                 reset={clearValue}
                 validator={validatePhoneNumber}
-                errorMessage="Número de teléfono inválido"
+                errorMessage="Número inválido"
                 onChange={handleInputChange}
                 label="Número"
                 name="phone"
@@ -480,7 +480,7 @@ export function PaymentButton({
               <ValidatedMultiselectCountry
                 validator={(value: string) => value.length > 0}
                 type="buyer"
-                errorMessage="Seleccione un país"
+                errorMessage="Seleccionar país"
                 onChange={handleInputChange}
                 label="País"
                 name="country"
@@ -493,7 +493,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
-                errorMessage="Ciudad inválida"
+                errorMessage="Solo letras de la A a la Z"
                 onChange={handleInputChange}
                 label="Ciudad"
                 name="city"
@@ -526,7 +526,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateZipCode}
-                errorMessage="Número de casa inválido"
+                errorMessage="Solo números  del 0 al 9"
                 onChange={handleInputChange}
                 label="Número"
                 name="number"

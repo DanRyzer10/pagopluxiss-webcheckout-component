@@ -5,8 +5,21 @@ export function validateCardNumber(cardNumber:string) {
 
 export function validateExpiryDate(expiryDate:string) {
     const regex = /^(0[1-9]|1[0-2])\/\d{2}$/;
-    return regex.test(expiryDate);
-  }
+    if (!regex.test(expiryDate)) {
+        return false;
+    }
+
+    const [month, year] = expiryDate.split('/').map(Number);
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // Los meses en JavaScript son 0-11
+    const currentYear = currentDate.getFullYear() % 100; // Obtener los últimos dos dígitos del año
+
+    if (year < currentYear || (year === currentYear && month < currentMonth)) {
+        return false;
+    }
+
+    return true;
+}
   export function validateCountrieSelection(countrie:{code:string,name:string}){
     return countrie.code !== '' && countrie.name !== '';
   }
