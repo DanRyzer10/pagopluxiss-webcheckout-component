@@ -55,9 +55,9 @@ export function validatePhoneNumber(phooneNumber:string){
 }
 export function validateZipCode(zipCode:string){
     if(!zipCode) return false;
-    //regex vaidated for 3 digits and not aceppt 000 and values greater than 999 and less than 0
-    const regex = /^(?!000)\d{3}$/;
-    return regex.test(zipCode); 
+    //regex vaidated for min 1 and max 3 digits and not aceppt 000 and values greater than 999 and less than 0
+    const regex = /^(?!000)\d{1,3}$/;
+    return regex.test(zipCode);
 }
 export function validateIdentificationNumber(idNumber:string,type:string){
     if(type==='ID'){

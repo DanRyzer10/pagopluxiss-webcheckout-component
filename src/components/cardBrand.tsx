@@ -87,10 +87,10 @@ export const CardBrand = ({
           }
         >
           {namesLayer.length + lastnamesLayer.length + 1 > 12
-            ? namesLayer.slice(0, 1) +
+            ? namesLayer.slice(0, 1).toUpperCase() +
               ". " +
-              lastnamesLayer.slice(0, 11 - names.length)
-            : namesLayer + " " + lastnamesLayer}
+              lastnamesLayer.slice(0, 11 - names.length).toUpperCase()
+            : namesLayer.toUpperCase() + " " + lastnamesLayer.toUpperCase()}
         </div>
         <div
           class={"col d-flex justify-content-end ppxiss-card-brand-font-small"}

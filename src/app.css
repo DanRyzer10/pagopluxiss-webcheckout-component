@@ -266,6 +266,14 @@ body{
   display: flex;
   justify-content: center;
 }
+.ppxiss-moreinfo-button{
+  color:#AEAEAE !important;
+  font-weight: 500;
+  font-size: 15px;
+  border: 1px solid #AEAEAE !important;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
 .ppxiss-button-split-info{
   font-size: 12px;
   position: absolute;

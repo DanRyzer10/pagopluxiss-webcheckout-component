@@ -383,7 +383,7 @@ export function PaymentButton({
               block={isLoading}
               type="buyer"
               validator={cityIdValidation}
-              errorMessage="Solo números del 0 al 9"
+              errorMessage="Solo se admiten números"
               onChange={handleInputChange}
               label="Cédula, RUC o Pasaporte"
               name="idNumber"
@@ -399,7 +399,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
-                errorMessage="Solo letras de la A a la Z"
+                errorMessage="Solo se admiten letras"
                 onChange={handleInputChange}
                 label="Nombre"
                 name="name"
@@ -414,7 +414,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
-                errorMessage="Solo letras de la A a la Z"
+                errorMessage="Solo se admiten letras"
                 onChange={handleInputChange}
                 label="Apellido"
                 name="lastName"
@@ -449,7 +449,7 @@ export function PaymentButton({
                 validator={(value: any) =>
                   value.code !== "" && value.name !== ""
                 }
-                errorMessage="Seleccionar país"
+                errorMessage="Número inválido"
                 type="buyer"
                 onChange={handleInputChange}
                 label="Teléfono"
@@ -493,7 +493,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateOnlyLetters}
-                errorMessage="Solo letras de la A a la Z"
+                errorMessage="Solo se admiten letras"
                 onChange={handleInputChange}
                 label="Ciudad"
                 name="city"
@@ -511,7 +511,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateLettersWithPoints}
-                errorMessage="Direccion invalida"
+                errorMessage="Caracter no permitido"
                 onChange={handleInputChange}
                 label="Dirección"
                 name="address"
@@ -526,7 +526,7 @@ export function PaymentButton({
                 type="buyer"
                 reset={clearValue}
                 validator={validateZipCode}
-                errorMessage="Solo números  del 0 al 9"
+                errorMessage="Máx. 3 números"
                 onChange={handleInputChange}
                 label="Número"
                 name="number"
@@ -540,6 +540,7 @@ export function PaymentButton({
           <div class={"row"}>
             <div class={"col d-flex justify-content-center"}>
               <button
+                class={"ppxiss-moreinfo-button"}
                 style={{
                   background: "none",
                   border: "none",
@@ -548,17 +549,7 @@ export function PaymentButton({
                 }}
                 onClick={onShowMoreInfo}
               >
-                <svg
-                  width="25px"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <g id="arrow-circle-up" fill="#0085FF">
-                    <path d="M12,21a9,9,0,1,1,9-9A9,9,0,0,1,12,21ZM12,4.5A7.5,7.5,0,1,0,19.5,12,7.5,7.5,0,0,0,12,4.5Z" />
-                    <path d="M16,12.75a.74.74,0,0,1-.53-.22L12,9.06,8.53,12.53a.75.75,0,0,1-1.06-1.06l4-4a.75.75,0,0,1,1.06,0l4,4a.75.75,0,0,1,0,1.06A.74.74,0,0,1,16,12.75Z" />
-                    <path d="M12,16.75a.76.76,0,0,1-.75-.75V8a.75.75,0,0,1,1.5,0v8A.76.76,0,0,1,12,16.75Z" />
-                  </g>
-                </svg>
+                continuar
               </button>
             </div>
           </div>
@@ -656,52 +647,54 @@ export function PaymentButton({
       )}
       <div class={"row"}>
         <div class={"col d-flex justify-content-center"}>
-          <SubmitButton
-            form="ppxiss-card-form"
-            activeButton={() => (isFormValid() as boolean) && !isLoading}
-            disabledButton={() => !isFormValid() || isLoading}
-          >
-            <div class="d-flex justify-content-center align-items-center">
-              <span style={{ marginRight: "5px" }}>
-                {config.module === "TOKENIZATION"
-                  ? "Registrar tarjeta"
-                  : `Pagar ${config.total_amount} ${config.currency}`}
-              </span>
-              {isLoading && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="xMidYMid"
-                  width="17"
-                  height="17"
-                  style="shape-rendering: auto; display: block; background: transparent;"
-                  xmlnsXlink="http://www.w3.org/1999/xlink"
-                >
-                  <g>
-                    <circle
-                      stroke-dasharray="164.93361431346415 56.97787143782138"
-                      r="35"
-                      stroke-width="10"
-                      stroke="#ffffff"
-                      fill="none"
-                      cy="50"
-                      cx="50"
-                    >
-                      <animateTransform
-                        keyTimes="0;1"
-                        values="0 50 50;360 50 50"
-                        dur="3.7037037037037033s"
-                        repeatCount="indefinite"
-                        type="rotate"
-                        attributeName="transform"
-                      ></animateTransform>
-                    </circle>
-                    <g></g>
-                  </g>
-                </svg>
-              )}
-            </div>
-          </SubmitButton>
+          {!showMoreInfo && (
+            <SubmitButton
+              form="ppxiss-card-form"
+              activeButton={() => (isFormValid() as boolean) && !isLoading}
+              disabledButton={() => !isFormValid() || isLoading}
+            >
+              <div class="d-flex justify-content-center align-items-center">
+                <span style={{ marginRight: "5px" }}>
+                  {config.module === "TOKENIZATION"
+                    ? "Registrar tarjeta"
+                    : `Pagar ${config.total_amount} ${config.currency}`}
+                </span>
+                {isLoading && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="xMidYMid"
+                    width="17"
+                    height="17"
+                    style="shape-rendering: auto; display: block; background: transparent;"
+                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                  >
+                    <g>
+                      <circle
+                        stroke-dasharray="164.93361431346415 56.97787143782138"
+                        r="35"
+                        stroke-width="10"
+                        stroke="#ffffff"
+                        fill="none"
+                        cy="50"
+                        cx="50"
+                      >
+                        <animateTransform
+                          keyTimes="0;1"
+                          values="0 50 50;360 50 50"
+                          dur="3.7037037037037033s"
+                          repeatCount="indefinite"
+                          type="rotate"
+                          attributeName="transform"
+                        ></animateTransform>
+                      </circle>
+                      <g></g>
+                    </g>
+                  </svg>
+                )}
+              </div>
+            </SubmitButton>
+          )}
         </div>
       </div>
       <div class={"row"}>
