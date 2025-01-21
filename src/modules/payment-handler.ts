@@ -43,7 +43,7 @@ export class PaymentHandler {
                 this.config.setting.simetricKey
             );
             const response = await this.apiService.post(service,payload);
-            return this.handlePaymentResponse(response);
+            return this.handlePaymentResponse(response?.data);
         }catch(error){
             console.error(error);
             throw new Error('Error al procesar el pago');
@@ -67,12 +67,12 @@ export class PaymentHandler {
             document.body.removeChild(this.modal);
             this.modal=null;
         }
-        if(response?.code==0){
+        if(response?.data.code==0){
             const successUrl = new URL(this.config.redirect_url);
             const urlParams:any = {
-                transaction_id: response.detail.id_transaccion,
-                status:response.status,
-                token:response.detail.token
+                transaction_id: response.data.detail.id_transaccion,
+                status:response.data.status,
+                token:response.data.detail.token
             }
             Object.keys(urlParams).forEach(key=>{
                 successUrl.searchParams.append(key,urlParams[key])
