@@ -425,23 +425,7 @@ export function PaymentButton({
             </div>
           </div>
 
-          <div class={"row px-2 "}>
-            <div class={"col"}>
-              <ValidatedInput
-                block={isLoading}
-                type="buyer"
-                reset={clearValue}
-                validator={validateEmail}
-                errorMessage="Correo inválido"
-                onChange={handleInputChange}
-                label="Correo"
-                name="email"
-                placeholder="Ingrese su correo electronico"
-                value={formData.buyer?.email.value}
-                isValid={formData.buyer?.email.isValid}
-              ></ValidatedInput>
-            </div>
-          </div>
+         
 
           <div class={"row px-2 "}>
             <div class={"col-4 pe-0"}>
@@ -472,6 +456,24 @@ export function PaymentButton({
                 value={formData.buyer?.phone.value}
                 isValid={formData.buyer?.phone.isValid}
               />
+            </div>
+          </div>
+
+          <div class={"row px-2 "}>
+            <div class={"col"}>
+              <ValidatedInput
+                block={isLoading}
+                type="buyer"
+                reset={clearValue}
+                validator={validateEmail}
+                errorMessage="Correo inválido"
+                onChange={handleInputChange}
+                label="Correo"
+                name="email"
+                placeholder="Ingrese su correo electronico"
+                value={formData.buyer?.email.value}
+                isValid={formData.buyer?.email.isValid}
+              ></ValidatedInput>
             </div>
           </div>
 
@@ -553,7 +555,7 @@ export function PaymentButton({
                 }}
                 onClick={onShowMoreInfo}
               >
-                continuar
+                Continuar
               </button>
             </div>
           </div>
