@@ -266,11 +266,19 @@ body{
   display: flex;
   justify-content: center;
 }
-.ppxiss-moreinfo-button{
+.ppxiss-moreinfo-button-inactive{
   color:#AEAEAE !important;
   font-weight: 500;
   font-size: 15px;
   border: 1px solid #AEAEAE !important;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+.ppxiss-moreinfo-button-active{
+  color:#1541be !important;
+  font-weight: 500;
+  font-size: 15px;
+  border: 1px solid #1541be !important;
   padding: 6px 12px;
   border-radius: 20px;
 }

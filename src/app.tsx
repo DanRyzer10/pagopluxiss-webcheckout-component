@@ -540,7 +540,11 @@ export function PaymentButton({
           <div class={"row"}>
             <div class={"col d-flex justify-content-center"}>
               <button
-                class={"ppxiss-moreinfo-button"}
+                className={
+                  isFormValid()
+                    ? "ppxiss-moreinfo-button-active"
+                    : "ppxiss-moreinfo-button-inactive"
+                }
                 style={{
                   background: "none",
                   border: "none",
