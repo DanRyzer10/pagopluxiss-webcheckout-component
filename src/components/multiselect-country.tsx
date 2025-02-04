@@ -97,7 +97,6 @@ const ValidatedMultiselectCountry = ({
     }
   };
   useEffect(() => {
-    console.log("Selected option:", selectedOption);
     localStorage.setItem("c_cc", JSON.stringify(selectedOption));
   }, [selectedOption]);
 
@@ -108,8 +107,6 @@ const ValidatedMultiselectCountry = ({
     setError(errorMsg || "");
     onChange(name, option.attributes.code, isValid, type || "card");
     setIsOpen(false);
-
-    console.log("Selected option:", selectedOption);
   };
 
   return (

@@ -33,7 +33,6 @@ const ValidatedMultiselect = ({ ...props }: ValidatedSelectProps) => {
       const newValue = event.target.value;
       //obtener el objeto seleccionado
 
-      console.log("newValue", newValue);
       setCreditType(newValue);
       const selectedValue: any = props.options.find(
         (option: any) => option.code === newValue

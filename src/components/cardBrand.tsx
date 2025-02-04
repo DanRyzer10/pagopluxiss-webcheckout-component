@@ -64,7 +64,6 @@ export const CardBrand = ({
     onUpdateDateLayer(expiredDate);
   }, [expiredDate]);
   useEffect(() => {
-    console.log("names", names);
     onUpdateNamesLayer(names);
   }, [names]);
   useEffect(() => {

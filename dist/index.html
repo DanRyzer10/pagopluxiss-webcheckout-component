@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boton de pagos</title>
+    <script type="module" crossorigin src="/checkout.js"></script>
+    
+  </head>
+  <body>
+    <style>
+      #iss-payment-button{
+          background-color: #FEFEFE;
+          border: none;
+          padding: 10px 5px;
+        font-size: 16px;
+        cursor: pointer;
+          border-radius: 5px;
+        margin-top: 20px;
+        border: 1.5px solid;
+
+        border-radius: 25px;
+        width: 300px;
+        border-image: linear-gradient(180deg, rgba(29, 58, 160, 0.1) 0%, #0085FF 50.5%, rgba(29, 58, 160, 0.1) 100%) 1;
+        box-shadow: 4px 4px 10px 0px #0000000D;
+
+        
+      }
+    </style>
+    <div id="dataweb"></div>
+    <!-- <script type="module">
+      new IssPaymentButton({
+    setting: {
+        production:false,
+        code: '674',
+        authorization: 'VDM0Y3RhandxY2NmV1cwQU4xdzdhZWl6TFU6bWVBNlJMUTE1R1Vmd2NtWVo1bU1uNXFxbEJ4NVprdTduUnVjZkJTN2N5RXhsV0xp',
+        secretKey: 'MzJob3llc2VsZGlhZGVtaXNhbnRvODk4OTg5MDkyMzg=',
+        simetricKey: 'pcnnWsqEqPPDSMv3PJ1Qnp5a6M1CrcwsLvRVgf0D+BrTKpyTONcSoa/6DZV8601qpsOhjCENdKp6k3LTkEmo0+/o90uliwDpp3zXlaT2KdhEGXUO7zHDJGcfpRZyhJSw14hqpsJFd+6PVjfpGXYGXjYnyEgwpqdbKBtIoHpmBxadPlLHEo+e0kxdLnKM5PTrK3mPY4CWHHYMNytuTuOE2vnvIiuNpzrYR13ToHlHEVAEYapIpBRShxUxPFuwNTIxuf84/PkSs0oul01HHRo2LbkHYdYelFFy2V9Jlg0nXPFk5cTtLEm/wOVnCD1Ds7WtVnqIdZUCDWYtjKBvAz8EbA=='
+    },
+    business:{
+      name:'MI tiendita',
+      email:'angeldanile@mail.com',
+      country:'EC',
+      country_code:593,
+      phonenumber:991899474, //convertir a string
+    },
+    reference_id: 'testReferenceId',
+    module: 'COLLECTION',
+    currency: 'USD',
+    total_amount: '100.00', //convertir a number
+    items: [
+        {
+            name:'lavadora',
+            quantity:5, 
+            price:89.98, 
+            discount:7.83,
+            amount:78.43
+        }
+    ],
+    installmentCredit: [
+       {
+        code:'883',
+        name:'diferido',
+        installments:[3,4,8]
+       },
+       {
+        code:'884',
+        name:'sin diferir',
+        installments:[]
+       }
+    ],
+    buyer: {
+       document_type:'ID',
+       identity:'0959157264',
+       names:'Angel',
+       lastnames:'Zambrano',
+       countrycode:593, //convertir a string
+       phonenumber:991899474, //convertir a string
+       email:'angeldaniel@gmail.com',
+       ipaddress:'172.178.2.1',
+    },
+    shipping_address: {
+        country:'EC',
+        state:'Pichincha',
+        city:'Quito',
+        Zipcode:'123',
+        street:'Av. Amazonas',
+        number:'1234'
+    },
+    redirect_url: 'http://localhost:3000',
+});
+
+    </script> -->
+  </body>
+</html>

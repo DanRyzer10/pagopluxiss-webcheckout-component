@@ -100,7 +100,6 @@ const ValidatedMultiSelectPhoneNumber = ({
     const errorMsg = isValid ? "" : errorMessage;
     setError(errorMsg || "");
     onChange(name, option.attributes.code, isValid, type || "card");
-    console.log("Selected option:", selectedOption);
     setIsOpen(false);
   };
 

@@ -3,6 +3,7 @@ import { validateOtp } from "../utils/validations";
 import OtpInput from "react-otp-input";
 
 export function OtpModal({ open, onAction, onOtpChange, onResendOtp }: any) {
+  //@ts-ignore
   const [visible, setVisible] = useState(open);
   const [block, setBlock] = useState(false);
   const [otp, setOtp] = useState("");
@@ -27,7 +28,6 @@ export function OtpModal({ open, onAction, onOtpChange, onResendOtp }: any) {
     onOtpChange(newOtp);
   };
   useEffect(() => {
-    console.log(otp);
     onOtpChange(otp);
   }, [otp]);
 
@@ -42,7 +42,6 @@ export function OtpModal({ open, onAction, onOtpChange, onResendOtp }: any) {
     e.preventDefault();
     setBlock(true);
     const otpError = validateOtp(otp) ? "" : "Otp Invalido";
-    console.log(visible);
     if (otpError) {
       setError({ otp: otpError });
       return;

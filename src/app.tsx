@@ -259,7 +259,6 @@ export function PaymentButton({
    * @memberof PaymentButton
    */
   const validateBuyerInfo = useMemo(() => {
-    console.log("formData.buyer: ", formData);
     return (
       formData.buyer &&
       Object.values(formData.buyer).every((field) => field.isValid)
@@ -280,7 +279,6 @@ export function PaymentButton({
     if (isFormValid()) {
       const payload: any = await ConvertToPayload();
       if (action === "otp") {
-        console.log("payload response: ", responseppx);
         payload.paramsOtp = {
           //@ts-ignore
           ...responseppx?.detail,
@@ -424,8 +422,6 @@ export function PaymentButton({
               ></ValidatedInput>
             </div>
           </div>
-
-         
 
           <div class={"row px-2 "}>
             <div class={"col-4 pe-0"}>
