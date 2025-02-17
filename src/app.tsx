@@ -253,6 +253,13 @@ export function PaymentButton({
       Object.values(formData.buyer).every((field) => field.isValid)
     );
   };
+
+  const isFormBuyerInfoValid = () => {
+    return (
+      formData.buyer &&
+      Object.values(formData.buyer).every((field) => field.isValid)
+    );
+  };
   /**
    * @description Valida si los campos del formulario del comprador son validos
    * @returns {boolean} - Retorna true si todos los campos del formulario del comprador son validos
@@ -294,6 +301,8 @@ export function PaymentButton({
         if (response?.status == "PENDING_OTP") {
           setVisibleModal(true);
           setResponse(response.response);
+        } else if (response?.status === "ERROR") {
+          onError("Error al procesar el pago");
         }
       } catch (e) {
         console.error(e);
@@ -539,7 +548,7 @@ export function PaymentButton({
             <div class={"col d-flex justify-content-center"}>
               <button
                 className={
-                  isFormValid()
+                  isFormBuyerInfoValid()
                     ? "ppxiss-moreinfo-button-active"
                     : "ppxiss-moreinfo-button-inactive"
                 }

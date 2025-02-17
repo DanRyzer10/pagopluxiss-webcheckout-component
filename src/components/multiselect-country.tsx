@@ -1,5 +1,7 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 import useGetCountries from "../api/use-get-countries";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 interface ValidatedSelectCountryProps {
   validator: (value: string) => boolean;
@@ -7,7 +9,6 @@ interface ValidatedSelectCountryProps {
   onChange: (
     name: any,
     value: any,
-    //@ts-ignore
     isValid: any,
     target: "card" | "buyer"
   ) => void;
@@ -55,47 +56,57 @@ const ValidatedMultiselectCountry = ({
   },
 }: ValidatedSelectCountryProps) => {
   const [options, setOptions] = useState<CountryOption[]>([]);
+  const [filteredOptions, setFilteredOptions] = useState<CountryOption[]>([]);
   const [selectedOption, setSelectedOption] =
     useState<CountryOption>(initialValue);
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const currCountrie = localStorage.getItem("c_cc");
+  const [searchText, setSearchText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    if (currCountrie) {
-      setSelectedOption(JSON.parse(currCountrie));
+    const storedCountry = localStorage.getItem("c_cc");
+    if (storedCountry) {
+      setSelectedOption(JSON.parse(storedCountry));
     }
-  }, []);
-  const fetchOptions = async (page: number) => {
-    try {
-      const callCountries = useGetCountries(page);
-      const data: any = await callCountries.getCountries();
-      if (data.data.length > 0) {
-        setOptions((prevOptions) => [...prevOptions, ...data.data]);
-      } else {
-        setHasMore(false);
+    handleFetchCountries();
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleFetchCountries = async () => {
+    try {
+      setIsLoading(true);
+      const promises = [1, 2, 3].map(fetchOptions);
+      const results = await Promise.all(promises);
+      const allOptions = results.flat();
+      setOptions(allOptions);
+      setFilteredOptions(allOptions);
     } catch (error) {
       console.error("Error fetching options:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleFocus = () => {
-    if (options.length === 0) {
-      fetchOptions(currentPage);
-    }
+  const fetchOptions = async (page: number): Promise<CountryOption[]> => {
+    const callCountries = useGetCountries(page);
+    const data: any = await callCountries.getCountries();
+    return data.data || [];
   };
-  const handleScroll = (event: any) => {
-    const bottom =
-      event.target.scrollHeight - event.target.scrollTop ===
-      event.target.clientHeight;
-    if (bottom && hasMore && currentPage < 3) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchOptions(nextPage);
-    }
-  };
+
   useEffect(() => {
     localStorage.setItem("c_cc", JSON.stringify(selectedOption));
   }, [selectedOption]);
@@ -103,60 +114,95 @@ const ValidatedMultiselectCountry = ({
   const handleSelect = (option: CountryOption) => {
     setSelectedOption(option);
     const isValid = validator(option.attributes.code);
-    const errorMsg = isValid ? "" : errorMessage;
-    setError(errorMsg || "");
+    setError(isValid ? "" : errorMessage || "");
     onChange(name, option.attributes.code, isValid, type || "card");
     setIsOpen(false);
   };
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+  const handleSearch = (event: any) => {
+    const searchValue = event.target.value.toLowerCase();
+    setSearchText(searchValue);
+    setFilteredOptions(
+      options.filter((option) =>
+        option.attributes.name.toLowerCase().includes(searchValue)
+      )
+    );
+  };
 
   return (
-    <div className="ppxiss-input-field-container">
-      <label className="ppx-iss-input-label">{label}</label>
-      <div
-        className={`custom-dropdown ${
-          error ? "ppxiss-input-component-error" : "ppxiss-input-component-ok"
-        }`}
-        onClick={handleFocus}
-      >
-        <div
-          className="dropdown-header"
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          {selectedOption.attributes?.code ? (
-            <span>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: selectedOption.attributes.icon,
-                }}
-                style={{ marginRight: "8px" }}
-              />
-              {selectedOption.attributes.name.length > 7
-                ? selectedOption.attributes.name.substring(0, 7) + "..."
-                : selectedOption.attributes.name}
-            </span>
-          ) : (
-            "país"
-          )}
-        </div>
-        {isOpen && (
-          <ul className="dropdown-list" onScroll={handleScroll}>
-            {options.map((option: any) => (
-              <li
-                key={option.attributes.code}
-                className="dropdown-item"
-                onClick={() => handleSelect(option)}
-              >
-                <span
-                  dangerouslySetInnerHTML={{ __html: option.attributes.icon }}
-                  style={{ marginRight: "8px" }}
+    <div ref={dropdownRef}>
+      {isLoading ? (
+        <Skeleton height={34} style={{ borderRadius: 20 }} />
+      ) : (
+        <div className="ppxiss-input-field-container">
+          <label className="ppx-iss-input-label">{label}</label>
+          <div
+            className={`custom-dropdown ${
+              error
+                ? "ppxiss-input-component-error"
+                : "ppxiss-input-component-ok"
+            }`}
+          >
+            <div
+              className={isOpen ? "dropdown-header p-0" : "dropdown-header"}
+              onClick={() => setIsOpen((prev) => !prev)}
+            >
+              {isOpen ? (
+                <input
+                  ref={inputRef}
+                  style={{ width: "100%" }}
+                  type="text"
+                  value={searchText}
+                  onChange={handleSearch}
+                  placeholder="Buscar país"
+                  className="dropdown-search"
+                  autoFocus
                 />
-                {option.attributes.name}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      {error && <div className="ppxiss-error-message">{error}</div>}
+              ) : (
+                <span>
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: selectedOption.attributes.icon,
+                    }}
+                    style={{ marginRight: "8px" }}
+                  />
+                  {selectedOption.attributes.name.length > 8
+                    ? selectedOption.attributes.name.substring(0, 8) + "..."
+                    : selectedOption.attributes.name}
+                </span>
+              )}
+            </div>
+            {isOpen && (
+              <ul className="dropdown-list">
+                {filteredOptions.length > 0 ? (
+                  filteredOptions.map((option) => (
+                    <li
+                      key={option.attributes.code}
+                      className="dropdown-item"
+                      onClick={() => handleSelect(option)}
+                    >
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: option.attributes.icon,
+                        }}
+                        style={{ marginRight: "8px" }}
+                      />
+                      {option.attributes.name}
+                    </li>
+                  ))
+                ) : (
+                  <li className="dropdown-not-found">Sin resultados</li>
+                )}
+              </ul>
+            )}
+          </div>
+          {error && <div className="ppxiss-error-message">{error}</div>}
+        </div>
+      )}
     </div>
   );
 };

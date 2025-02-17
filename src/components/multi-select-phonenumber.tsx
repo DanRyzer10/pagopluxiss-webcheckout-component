@@ -1,5 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 import useGetCountries from "../api/use-get-countries";
+import Skeleton from "react-loading-skeleton";
 interface ValidatedSelectCountryProps {
   validator: (value: string) => boolean;
   errorMessage?: string;
@@ -59,11 +60,30 @@ const ValidatedMultiSelectPhoneNumber = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const currCountrie = localStorage.getItem("c_cc");
+  //@ts-ignore
+  const [isLoading, setIsLoading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  //@ts-ignore
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (currCountrie) {
       setSelectedOption(JSON.parse(currCountrie));
     }
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
+
   const fetchOptions = async (page: number) => {
     try {
       const callCountries = useGetCountries(page);
@@ -104,39 +124,47 @@ const ValidatedMultiSelectPhoneNumber = ({
   };
 
   return (
-    <div className="ppxiss-input-field-container ">
-      <label className="ppx-iss-input-label">Celular</label>
-      <div
-        className={`custom-dropdown-alter w-100 ${
-          error ? "ppxiss-input-component-error" : "ppxiss-input-component-ok"
-        }`}
-        onClick={handleFocus}
-      >
-        <div
-          className="dropdown-header-alter"
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          {selectedOption.attributes?.code ? (
-            <span>{`+${selectedOption.attributes.number} `}</span>
-          ) : (
-            "+"
-          )}
+    <div ref={dropdownRef}>
+      {isLoading ? (
+        <Skeleton height={34} style={{ borderRadius: 20 }} />
+      ) : (
+        <div className="ppxiss-input-field-container ">
+          <label className="ppx-iss-input-label">Celular</label>
+          <div
+            className={`custom-dropdown-alter w-100 ${
+              error
+                ? "ppxiss-input-component-error"
+                : "ppxiss-input-component-ok"
+            }`}
+            onClick={handleFocus}
+          >
+            <div
+              className="dropdown-header-alter"
+              onClick={() => setIsOpen((prev) => !prev)}
+            >
+              {selectedOption.attributes?.code ? (
+                <span>{`+${selectedOption.attributes.number} `}</span>
+              ) : (
+                "+"
+              )}
+            </div>
+            {isOpen && (
+              <ul className="dropdown-list" onScroll={handleScroll}>
+                {options.map((option: any) => (
+                  <li
+                    key={option.attributes.code}
+                    className="dropdown-item"
+                    onClick={() => handleSelect(option)}
+                  >
+                    {`+${option.attributes.number}`}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {error && <div className="ppxiss-error-message">{error}</div>}
         </div>
-        {isOpen && (
-          <ul className="dropdown-list" onScroll={handleScroll}>
-            {options.map((option: any) => (
-              <li
-                key={option.attributes.code}
-                className="dropdown-item"
-                onClick={() => handleSelect(option)}
-              >
-                {`+${option.attributes.number}`}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      {error && <div className="ppxiss-error-message">{error}</div>}
+      )}
     </div>
   );
 };
